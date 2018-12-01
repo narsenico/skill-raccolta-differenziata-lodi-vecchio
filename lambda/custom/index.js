@@ -18,25 +18,16 @@ const CARD_TITLE = 'Raccolta differenziata Lodi Vecchio',
   DAY_OF_WEEK = ['domenica', 'lunedì', 'martedì', 'mercoledì', 'giovedì', 'venerdì', 'sabato'],
   DATE_FORMAT = 'YYYY-MM-DD',
   DATE_LONG_FORMAT = 'dddd, D MMMM',
+  OUT_SPEAKER = 'speaker',
+  OUT_CARD = 'card',
   // data = require('data.json'),
   destinations = require('destinations.json'),
   calendar = require('calendar.json'),
-  rcalendar = reveserCalendar()
+  rcalendar = reveserCalendar(),
+  rgPlural = /^(i|gli|le)$/i
   // , rgParticles = /\b(a|il|lo|la|l'|i|gli|le|un|uno|una|un'|di|del|della|dell'|delle|degli|al|in|da|per|\d+)\b/g
   ;
-// tutti gli articoli con indicazione [P]lurarle, [S]ingolare
-const ARTICLES = {
-  "l": "S", // l con apostrofo
-  "lo": "S",
-  "la": "S",
-  "il": "S",
-  "un": "S",
-  "uno": "S",
-  "una": "S",
-  "i": "P",
-  "gli": "P",
-  "le": "P"
-};
+
 /**
 * 
 * @param {Object} slot slot da cui estrarre il valore
@@ -107,7 +98,7 @@ function getSlotValues(filledSlots) {
 //  * @param {String} query frase di ricerca
 //  * @returns la frase in output già formattata per lo speaker
 //  */
-// function findWhere(query) {
+// function execWhere(query) {
 //   if (query) {
 //     // normalizzo la query
 //     // - elimino le particelle grammaticali
@@ -165,17 +156,20 @@ function getSlotValues(filledSlots) {
 /**
  * 
  * @param {Strign} idGarbage id rifiuto
+ * @param {String} article  particella articolo
  * @param {String} garbage frase pronunciata dall'utente
- * @returns la frase in output già formattata per lo speaker
+ * @param {OUT_SPEAKER|OUT_CARD} outDest  destinazione
+ * @returns la frase in output già formattata in base alla destinazione
  */
-function findWhere(idGarbage, garbage) {
+function execWhere(idGarbage, article, garbage, outDest) {
+  const fnPhrase = outDest == OUT_SPEAKER ? toSpeakPhrase : toCardPhrase;
   const dest = destinations[idGarbage];
-  const sp = /^[i|gli|le]\s+/.test(garbage) ? 'vanno' : 'va';
-  console.log("WHERE", idGarbage, sp, JSON.stringify(dest));
+  const sp = rgPlural.test(article) ? 'vanno' : 'va';
+  console.log("WHERE", idGarbage, article, garbage, sp, JSON.stringify(dest));
   if (dest) {
-    return `${garbage} ${sp} ${dest.where}`;
+    return fnPhrase(`${article} ${garbage} ${sp} ${dest.where}`);
   } else {
-    return `Mi spiace, non so dove buttare ${garbage}, prova a conttatare il comune`;
+    return fnPhrase(`Mi spiace, non so dove buttare ${article} ${garbage}, prova a conttatare il comune`);
   }
 }
 
@@ -183,9 +177,11 @@ function findWhere(idGarbage, garbage) {
  * Dato il codice materiale ritorna il giorno di ritiro.
  * 
  * @param {String} idMaterial vedi chiavi in destinations.json
- * @returns la frase in output già formattata per lo speaker
+ * @param {OUT_SPEAKER|OUT_CARD} outDest  destinazione
+ * @returns la frase in output già formattata in base alla destinazione
  */
-function findWhen(idMaterial) {
+function execWhen(idMaterial, outDest) {
+  const fnPhrase = outDest == OUT_SPEAKER ? toSpeakPhrase : toCardPhrase;
   const today = moment();
   const stoday = today.format(DATE_FORMAT);
   const stomorrow = moment().add(1, 'days').format(DATE_FORMAT);
@@ -202,42 +198,53 @@ function findWhen(idMaterial) {
       'found', found);
     if (found) {
       if (found === stoday) {
-        return 'Il ritiro è previsto per oggi, entro le ore sei del mattino.';
+        return fnPhrase('Il ritiro è previsto per oggi, entro le ore sei del mattino');
       } else if (found === stomorrow) {
-        return 'Il ritiro è previsto per domani.';
+        return fnPhrase('Il ritiro è previsto per domani');
       } else {
-        return `Il ritiro è previsto per
-          ${moment(found).locale('it').format(DATE_LONG_FORMAT)}`;
+        return fnPhrase(`Il ritiro è previsto per
+          ${moment(found).locale('it').format(DATE_LONG_FORMAT)}`);
       }
     } else {
       // il materiale è censito, ma non sono state trovate date utili
-      return `Non sono state trovate date utili per il ritiro del materiale indicato,
-        per maggiori informazioni contattare il comune.`;
+      return fnPhrase(`Non sono state trovate date utili per il ritiro del materiale indicato,
+        per maggiori informazioni contattare il comune.`);
     }
   }
-  return `Non è previsto alcun ritiro per il materiale indicato, 
-    contattare il comune per maggiori informazioni.`;
+  return fnPhrase(`Non è previsto alcun ritiro per il materiale indicato, 
+    contattare il comune per maggiori informazioni.`);
 }
 
 /**
  * ELenca i materiali ritirati nei giorni in input.
  * 
  * @param {Array<String>} dates array di date nel formato YYYY-MM-DD
- * @returns la frase in output già formattata per lo speaker
+ * @param {OUT_SPEAKER|OUT_CARD} outDest  destinazione 
+ * @returns la frase in output già formattata in base alla destinazione
  */
-function findWhat(dates) {
+function execWhat(dates, outDest) {
+  const fnList = outDest == OUT_SPEAKER ? toSpeakPhrase : toCardList;
+  const fnPhrase = outDest == OUT_SPEAKER ? toSpeakPhrase : toCardPhrase;
+  const stoday = moment().format(DATE_FORMAT);
   let materials;
   let output = '';
   for (let ii = 0; ii < dates.length; ii++) {
     materials = rcalendar[dates[ii]];
+    console.log('WHAT', dates[ii], materials);
     if (materials) {
-      output += '<s>' + moment(dates[ii]).locale('it').format(DATE_LONG_FORMAT) + ', ritirano ';
-      output += speakJoin(materials.map(m => destinations[m].what));
-      output += '</s>';
+      output += fnList(`${dates[ii] === stoday ? 'Oggi' : moment(dates[ii]).locale('it').format(DATE_LONG_FORMAT)},
+        ritirano ${humanJoin(materials.map(m => destinations[m].what))}`);
     }
   }
-  return output || 'Non è previsto alcun ritiro';
-  // return dates.map(d => `${moment(d).locale('it').format(DATE_LONG_FORMAT)}`).join(', ');
+  if (output) {
+    if (Math.random() >= .5) {
+      return output + fnPhrase('Ricordati che devi esporre i rifiuti entro le ore sei');
+    } else {
+      return output;
+    }
+  } else {
+    return fnPhrase('Non è previsto alcun ritiro');
+  }
 }
 
 /**
@@ -257,7 +264,7 @@ function findWhat(dates) {
 function parseDateString(sdate) {
   const dayOfWeek = DAY_OF_WEEK.indexOf(sdate);
   if (dayOfWeek >= 0) {
-    return [nextDay(moment(), dayOfWeek).format(DATE_FORMAT)];
+    return [nextDay(dayOfWeek).format(DATE_FORMAT)];
   } else if (/^\d{4}-W\d{1,2}-WE$/.test(sdate)) {
     // il formato YYYY-Www ritorna un lunedì
     const date = moment(sdate.substr(0, 8));
@@ -286,35 +293,40 @@ function parseDateString(sdate) {
  * @param {Number} dayOfWeek indice del giorno della settimana (domencia = 0)
  * @returns mdate (aggiornata)
  */
-function nextDay(mdate, dayOfWeek) {
+function nextDay(dayOfWeek) {
   // sono a domenica 0 e voglio martedì 0 + 2
   // sono a lunedì 1 e voglio martedì 2 - 1
   // sono a sabato 6 e voglio martedì 7 - 6 + 2
   // sono a venerdì 5 e voglio martedì 7 - 5 + 2
 
-  const curDayOfWeek = mdate.day();
+  const today = moment();
+  const curDayOfWeek = today.day();
   if (curDayOfWeek === dayOfWeek) {
-    return mdate;
+    if (today.tz('Europe/Rome').hour() > 6) {
+      return today.add(7, 'days');
+    } else {
+      return today;
+    }
   } else if (curDayOfWeek < dayOfWeek) {
-    return mdate.add(dayOfWeek - curDayOfWeek, 'days');
+    return today.add(dayOfWeek - curDayOfWeek, 'days');
   } else {
-    return mdate.add(7 - curDayOfWeek + dayOfWeek, 'days');
+    return today.add(7 - curDayOfWeek + dayOfWeek, 'days');
   }
 }
 
-/**
- * Converte il formato <speak> in uno più adatto alla resa su schermo.
- * Quindi niente tag.
- * 
- * @param {String} speak stringa formattata per il sintetizzatore vocale
- * @returns stringa adatta alla stampa a schermo
- */
-function speakToCard(speak) {
-  // TODO: convertire speak a card
-  return speak;
+function toSpeakPhrase(string) {
+  return `<s>${string}</s>`;
 }
 
-function speakJoin(phrases) {
+function toCardPhrase(string) {
+  return `${string}.\n`;
+}
+
+function toCardList(string) {
+  return `* ${string}\n`;
+}
+
+function humanJoin(phrases) {
   if (phrases.length === 1) {
     return phrases[0];
   } else {
@@ -338,20 +350,20 @@ const LaunchRequestHandler = {
     return handlerInput.requestEnvelope.request.type === 'LaunchRequest';
   },
   handle(handlerInput) {
-    const speechText = `Benvenuto. Puoi chiedermi ad esempio: 
-      <s>dove devo buttare il sacchetto delle patatine?</s>`;
+    const speechText = `Benvenuto in raccolta differenziata Lodi Vecchio. 
+      <s>Chiedi aiuto per scoprire tutte le funzionalità di questa skill</s>`;
 
     return handlerInput.responseBuilder
       .speak(speechText)
       .reprompt(speechText)
-      .withSimpleCard(CARD_TITLE, speechText)
       .getResponse();
   },
 };
 
 /**
  * Slots:
- * - {query} frase di ricerca
+ * - {article} particella articolo
+ * - {garbage} rifiuto
  */
 const WhereIntent = {
   canHandle(handlerInput) {
@@ -362,22 +374,22 @@ const WhereIntent = {
     const responseBuilder = handlerInput.responseBuilder;
     const filledSlots = handlerInput.requestEnvelope.request.intent.slots;
     const slotValues = getSlotValues(filledSlots);
-    let speechText;
     // se garbage è valorizzato allora proseguo con l'elaborazione
     //  altrimenti richiedo all'utente di indicare il nome del rifiuto
     if (slotValues.garbage && slotValues.garbage.id) {
-      speechText = findWhere(slotValues.garbage.id,
-        slotValues.garbage.synonym);
-      // speechText = `Hai detto: ${slotValues.garbage.resolved}, ${slotValues.garbage.synonym} => ${slotValues.garbage.id}`;
+      responseBuilder
+        .speak(execWhere(slotValues.garbage.id,
+          (slotValues.article && slotValues.article.synonym) || '',
+          slotValues.garbage.synonym, OUT_SPEAKER))
+        .withSimpleCard(CARD_TITLE, execWhere(slotValues.garbage.id,
+          (slotValues.article && slotValues.article.synonym) || '',
+          slotValues.garbage.synonym, OUT_CARD));
     } else {
-      speechText = 'Cosa vuoi buttare?';
-      // TODO: va in errore, provare a rimettere in model prompt
-      responseBuilder.addElicitSlotDirective('garbage');
+      responseBuilder
+        .speak('Ripeti il nome del rifiuto per favore.')
+        .addElicitSlotDirective('garbage');
     }
-    console.log('*** response:', speechText);
     return responseBuilder
-      .speak(speechText)
-      .withSimpleCard(CARD_TITLE, speakToCard(speechText))
       .getResponse();
   },
 };
@@ -398,16 +410,16 @@ const WhenIntent = {
     const responseBuilder = handlerInput.responseBuilder;
     const filledSlots = handlerInput.requestEnvelope.request.intent.slots;
     const slotValues = getSlotValues(filledSlots);
-    let speechText;
     if (slotValues.material && slotValues.material.id) {
-      speechText = findWhen(slotValues.material.id);
+      responseBuilder
+        .speak(execWhen(slotValues.material.id, OUT_SPEAKER))
+        .withSimpleCard(CARD_TITLE, execWhen(slotValues.material.id, OUT_CARD));
     } else {
-      speechText = 'Ripeti la tipologia dei rifiuti per favore.';
-      responseBuilder.addElicitSlotDirective('material');
+      responseBuilder
+        .speak('Ripeti la tipologia dei rifiuti per favore.')
+        .addElicitSlotDirective('material');
     }
     return responseBuilder
-      .speak(speechText)
-      .withSimpleCard(CARD_TITLE, speakToCard(speechText))
       .getResponse();
   }
 }
@@ -428,7 +440,6 @@ const WhatIntent = {
     const responseBuilder = handlerInput.responseBuilder;
     const filledSlots = handlerInput.requestEnvelope.request.intent.slots;
     const slotValues = getSlotValues(filledSlots);
-    let speechText;
 
     // data -> date YYYY-MM-DD
     // domani -> date YYYY-MM-DD
@@ -442,22 +453,18 @@ const WhatIntent = {
     // questo fine settimana -> date 2018-W<numero settimana>-WE
     // giorno settimana -> dayOfWeek (lunedì, martedì, etc.)
 
-    // TODO: prossimo <giorno settimana> non funziona bene
-    //  se oggi è domenica "la prossima domenica" ritorna oggi
-
     // TODO: prevedere "fra n giorni"
 
     let date = (slotValues.date && slotValues.date.resolved) ||
       (slotValues.dayOfWeek && slotValues.dayOfWeek.resolved);
     if (date && (date = parseDateString(date))) {
-      speechText = findWhat(date);
+      responseBuilder.speak(execWhat(date, OUT_SPEAKER))
+        .withSimpleCard(CARD_TITLE, execWhat(date, OUT_CARD));
     } else {
-      speechText = 'Ripeti la data per favore.';
-      responseBuilder.addElicitSlotDirective('date');
+      responseBuilder.speak('Ripeti la data per favore.')
+        .addElicitSlotDirective('date');
     }
     return responseBuilder
-      .speak(speechText)
-      .withSimpleCard(CARD_TITLE, speakToCard(speechText))
       .getResponse();
   }
 }
@@ -468,12 +475,16 @@ const HelpIntentHandler = {
       && handlerInput.requestEnvelope.request.intent.name === 'AMAZON.HelpIntent';
   },
   handle(handlerInput) {
-    const speechText = 'Puoi chiedermi dove si possono riciclare le lattine';
+    const speechText = `Ecco cosa mi puoi chiedere:
+      <s>dove si buttano le lattine?</s>
+      oppure
+      <s>quando ritirano la plastica?</s>
+      o ancora
+      <s>cosa ritirano domani?</s>`;
 
     return handlerInput.responseBuilder
       .speak(speechText)
       .reprompt(speechText)
-      .withSimpleCard(CARD_TITLE, speechText)
       .getResponse();
   },
 };
@@ -489,7 +500,6 @@ const CancelAndStopIntentHandler = {
 
     return handlerInput.responseBuilder
       .speak(speechText)
-      .withSimpleCard(CARD_TITLE, speechText)
       .withShouldEndSession(true)
       .getResponse();
   },

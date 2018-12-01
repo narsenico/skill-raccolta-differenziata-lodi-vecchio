@@ -28,19 +28,19 @@
                         }
                     ],
                     "samples": [
-                        "dove butto {garbage}",
-                        "dove buttare {garbage}",
-                        "dove devo buttare {garbage}",
-                        "dove posso buttare {garbage}",
-                        "dove posso riciclare {garbage}",
-                        "dove riciclare {garbage}",
-                        "dove si butta {garbage}",
-                        "dove si buttano {garbage}",
-                        "dove si possono buttare {garbage}",
-                        "dove si possono riciclare {garbage}",
-                        "dove si può buttare {garbage}",
-                        "dove si può riciclare {garbage}",
-                        "dove si riciclano {garbage}"
+                        "dove butto {article} {garbage}",
+                        "dove buttare {article} {garbage}",
+                        "dove devo buttare {article} {garbage}",
+                        "dove posso buttare {article} {garbage}",
+                        "dove posso riciclare {article} {garbage}",
+                        "dove riciclare {article} {garbage}",
+                        "dove si butta {article} {garbage}",
+                        "dove si buttano {article} {garbage}",
+                        "dove si possono buttare {article} {garbage}",
+                        "dove si possono riciclare {article} {garbage}",
+                        "dove si può buttare {article} {garbage}",
+                        "dove si può riciclare {article} {garbage}",
+                        "dove si riciclano {article} {garbage}"
                     ]
                 },
                 {
@@ -185,32 +185,44 @@
                                 "value": "CART",
                                 "synonyms": [
                                     "agenda",
+                                    "agende",
                                     "block notes",
                                     "carta",
-                                    "la carta",
-                                    "cartelletta carta",
-                                    "cartelletta cartone",
+                                    "cartelletta di carta",
+                                    "cartelletta di cartone",
                                     "cartone",
-                                    "cartoni alimenti",
-                                    "cartoni latte",
-                                    "cartoni succhi",
-                                    "confezioni carta",
-                                    "confezioni tetrapak",
-                                    "fogli carta",
-                                    "i fumetti",
-                                    "il giornale",
-                                    "i giornali",
-                                    "imballaggi carta",
-                                    "imballaggi cartone",
+                                    "cartoni per alimenti",
+                                    "cartoni per latte",
+                                    "cartoni per succhi",
+                                    "confezione di carta",
+                                    "confezioni di carta",
+                                    "confezione di tetrapak",
+                                    "confezioni di tetrapak",
+                                    "foglio di carta",
+                                    "fogli di carta",
+                                    "fumetto",
+                                    "fumetti",
+                                    "giornale",
+                                    "giornali",
+                                    "imballaggio di carta",
+                                    "imballaggi di carta",
+                                    "imballaggio di cartone",
+                                    "imballaggi di cartone",
+                                    "libro",
                                     "libri",
-                                    "portauova cartone",
+                                    "portauova di cartone",
                                     "quaderno",
+                                    "quaderni",
+                                    "rivista",
                                     "riviste",
-                                    "scatole cartone",
+                                    "scatola di cartone",
+                                    "scatole di cartone",
                                     "tetrapak",
-                                    "tovaglia carta",
-                                    "tovaglioli carta",
-                                    "vaschette cartone uova"
+                                    "tovaglia di carta",
+                                    "tovagliolo di carta",
+                                    "tovaglioli di carta",
+                                    "vaschetta di cartone per uova",
+                                    "vaschette di cartone per uova"
                                 ]
                             }
                         },
@@ -583,6 +595,87 @@
                     ]
                 }
             ]
-        }
+        },
+        "dialog": {
+            "intents": [
+                {
+                    "name": "WhereIntent",
+                    "confirmationRequired": false,
+                    "prompts": {},
+                    "slots": [
+                        {
+                            "name": "garbage",
+                            "type": "TYPE_GARBAGE",
+                            "confirmationRequired": false,
+                            "elicitationRequired": true,
+                            "prompts": {
+                                "elicitation": "Elicit.Slot.WhereIntent_Garbage"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "WhenIntent",
+                    "confirmationRequired": false,
+                    "prompts": {},
+                    "slots": [
+                        {
+                            "name": "material",
+                            "type": "TYPE_MATERIAL",
+                            "confirmationRequired": false,
+                            "elicitationRequired": true,
+                            "prompts": {
+                                "elicitation": "Elicit.Slot.WhenIntent_Material"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "WhatIntent",
+                    "confirmationRequired": false,
+                    "prompts": {},
+                    "slots": [
+                        {
+                            "name": "date",
+                            "type": "AMAZON.DATE",
+                            "confirmationRequired": false,
+                            "elicitationRequired": true,
+                            "prompts": {
+                                "elicitation": "Elicit.Slot.WhatIntent_Date"
+                            }
+                        }
+                    ]
+                }
+            ]
+        },
+        "prompts": [
+            {
+                "id": "Elicit.Slot.WhereIntent_Garbage",
+                "variations": [
+                    {
+                        "type": "PlainText",
+                        "value": "Cosa vuoi buttare?"
+                    }
+                ]
+            },
+            {
+                "id": "Elicit.Slot.WhenIntent_Material",
+                "variations": [
+                    {
+                        "type": "PlainText",
+                        "value": "Ripeti la tipologia dei rifiuti per favore"
+                    }
+                ]
+            },
+            {
+                "id": "Elicit.Slot.WhatIntent_Date",
+                "variations": [
+                    {
+                        "type": "PlainText",
+                        "value": "Ripeti la data per favore"
+                    }
+                ]
+            }
+        ]
     }
 }

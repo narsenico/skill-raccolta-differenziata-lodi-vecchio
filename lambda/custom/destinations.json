@@ -1,7 +1,7 @@
 {
     "CART": {
         "where": "in Carta e Cartone",
-        "what": "Carta e Cartone"
+        "what": "la Carta e il Cartone"
     },
     "CRAP": {
         "where": "al Centro di Raccolta, Piattaforma",
@@ -21,7 +21,7 @@
     },
     "PLAS": {
         "where": "nella Plastica",
-        "what": "Plastica"
+        "what": "la Plastica"
     },
     "PILE": {
         "where": "nei Contenitori Stradali per Pile",
@@ -29,14 +29,14 @@
     },
     "SECC": {
         "where": "nel Secco",
-        "what": "Secco"
+        "what": "il Secco"
     },
     "UMID": {
         "where": "nel Umido",
-        "what": "Umido"
+        "what": "l'Umido"
     },
     "VETR": {
         "where": "nel Vetro",
-        "what": "Vetro"
+        "what": "il Vetro"
     }
 }
