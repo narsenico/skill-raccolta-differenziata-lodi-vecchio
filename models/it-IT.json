@@ -1,0 +1,588 @@
+{
+    "interactionModel": {
+        "languageModel": {
+            "invocationName": "raccolta differenziata",
+            "intents": [
+                {
+                    "name": "AMAZON.CancelIntent",
+                    "samples": []
+                },
+                {
+                    "name": "AMAZON.HelpIntent",
+                    "samples": []
+                },
+                {
+                    "name": "AMAZON.StopIntent",
+                    "samples": []
+                },
+                {
+                    "name": "WhereIntent",
+                    "slots": [
+                        {
+                            "name": "article",
+                            "type": "TYPE_ARTICLE"
+                        },
+                        {
+                            "name": "garbage",
+                            "type": "TYPE_GARBAGE"
+                        }
+                    ],
+                    "samples": [
+                        "dove butto {garbage}",
+                        "dove buttare {garbage}",
+                        "dove devo buttare {garbage}",
+                        "dove posso buttare {garbage}",
+                        "dove posso riciclare {garbage}",
+                        "dove riciclare {garbage}",
+                        "dove si butta {garbage}",
+                        "dove si buttano {garbage}",
+                        "dove si possono buttare {garbage}",
+                        "dove si possono riciclare {garbage}",
+                        "dove si può buttare {garbage}",
+                        "dove si può riciclare {garbage}",
+                        "dove si riciclano {garbage}"
+                    ]
+                },
+                {
+                    "name": "WhenIntent",
+                    "slots": [
+                        {
+                            "name": "article",
+                            "type": "TYPE_ARTICLE"
+                        },
+                        {
+                            "name": "material",
+                            "type": "TYPE_MATERIAL"
+                        }
+                    ],
+                    "samples": [
+                        "quando ritirano {article} {material}",
+                        "quando si ritira {article} {material}",
+                        "quando viene ritirato {article} {material}",
+                        "quando viene ritirata {article} {material}",
+                        "quando vengono ritirati {article} {material}",
+                        "quando vengono ritirate {article} {material}"
+                    ]
+                },
+                {
+                    "name": "WhatIntent",
+                    "slots": [
+                        {
+                            "name": "date",
+                            "type": "AMAZON.DATE"
+                        },
+                        {
+                            "name": "dayOfWeek",
+                            "type": "AMAZON.DayOfWeek"
+                        }
+                    ],
+                    "samples": [
+                        "cosa ritirano il prossimo {dayOfWeek}",
+                        "cosa ritirano la prossima {dayOfWeek}",
+                        "cosa ritirano il {date}",
+                        "cosa ritirano la {date}",
+                        "cosa ritirano il giorno {date}",
+                        "cosa ritirano in data {date}",
+                        "cosa ritirano {date}",
+                        "cosa ritirano di {dayOfWeek}",
+                        "cosa ritirano {dayOfWeek}"
+                    ]
+                }
+            ],
+            "types": [
+                {
+                    "name": "TYPE_ARTICLE",
+                    "values": [
+                        {
+                            "name": {
+                                "value": "il",
+                                "synonyms": [
+                                    "l",
+                                    "lo",
+                                    "la",
+                                    "i",
+                                    "gli",
+                                    "le",
+                                    "un",
+                                    "uno",
+                                    "una"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "TYPE_MATERIAL",
+                    "values": [
+                        {
+                            "id": "CART",
+                            "name": {
+                                "value": "carta",
+                                "synonyms": [
+                                    "carte",
+                                    "cartone",
+                                    "cartoni"
+                                ]
+                            }
+                        },
+                        {
+                            "id": "PLAS",
+                            "name": {
+                                "value": "plastica",
+                                "synonyms": [
+                                    "plastiche"
+                                ]
+                            }
+                        },
+                        {
+                            "id": "SECC",
+                            "name": {
+                                "value": "secco",
+                                "synonyms": [
+                                    "indifferenziata"
+                                ]
+                            }
+                        },
+                        {
+                            "id": "UMID",
+                            "name": {
+                                "value": "umido"
+                            }
+                        },
+                        {
+                            "id": "VETR",
+                            "name": {
+                                "value": "vetro"
+                            }
+                        },
+                        {
+                            "id": "LATT",
+                            "name": {
+                                "value": "lattina",
+                                "synonyms": [
+                                    "lattine",
+                                    "scatolame"
+                                ]
+                            }
+                        },
+                        {
+                            "id": "TEST",
+                            "name": {
+                                "value": "test",
+                                "synonyms": [
+                                    "prova"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "TYPE_GARBAGE",
+                    "values": [
+                        {
+                            "id": "CART",
+                            "name": {
+                                "value": "CART",
+                                "synonyms": [
+                                    "agenda",
+                                    "block notes",
+                                    "carta",
+                                    "la carta",
+                                    "cartelletta carta",
+                                    "cartelletta cartone",
+                                    "cartone",
+                                    "cartoni alimenti",
+                                    "cartoni latte",
+                                    "cartoni succhi",
+                                    "confezioni carta",
+                                    "confezioni tetrapak",
+                                    "fogli carta",
+                                    "i fumetti",
+                                    "il giornale",
+                                    "i giornali",
+                                    "imballaggi carta",
+                                    "imballaggi cartone",
+                                    "libri",
+                                    "portauova cartone",
+                                    "quaderno",
+                                    "riviste",
+                                    "scatole cartone",
+                                    "tetrapak",
+                                    "tovaglia carta",
+                                    "tovaglioli carta",
+                                    "vaschette cartone uova"
+                                ]
+                            }
+                        },
+                        {
+                            "id": "CRAC",
+                            "name": {
+                                "value": "CRAC",
+                                "synonyms": [
+                                    "abiti buono stato",
+                                    "borse",
+                                    "cintura",
+                                    "valigie",
+                                    "zaini",
+                                    "zaino"
+                                ]
+                            }
+                        },
+                        {
+                            "id": "CRAP",
+                            "name": {
+                                "value": "CRAP",
+                                "synonyms": [
+                                    "affettatrice",
+                                    "alberi finti",
+                                    "alberi",
+                                    "armadi legno",
+                                    "asse stiro",
+                                    "barattoli colle",
+                                    "barattoli vernici",
+                                    "batterie auto",
+                                    "batterie piombo",
+                                    "bicicletta",
+                                    "bidoni portarifiuti",
+                                    "bilancia",
+                                    "borsa pelle",
+                                    "borsa tessuto",
+                                    "calcinacci",
+                                    "carrozzine",
+                                    "cartuccia stampante",
+                                    "cassette legno",
+                                    "cellulare",
+                                    "ceramica",
+                                    "cestini portarifiuti",
+                                    "cesto vimini",
+                                    "computer",
+                                    "condizionatore",
+                                    "coperchio pentola alluminio",
+                                    "cuscino",
+                                    "damigiana",
+                                    "divano",
+                                    "elettrodomestici",
+                                    "erba",
+                                    "ferro stiro",
+                                    "ferro",
+                                    "filtri olio",
+                                    "foglie",
+                                    "freezer",
+                                    "frullatore",
+                                    "giocattoli ferro",
+                                    "giocattoli plastica",
+                                    "indumenti",
+                                    "lampada abbronzante",
+                                    "lampada",
+                                    "lampadario",
+                                    "lampadina risparmio energetico",
+                                    "legno verniciato",
+                                    "legno",
+                                    "letto",
+                                    "macerie",
+                                    "materasso",
+                                    "materiale elettrico",
+                                    "materiali demolizione",
+                                    "metalli",
+                                    "microonde",
+                                    "mobili",
+                                    "monitor tv",
+                                    "monitor",
+                                    "neon",
+                                    "olio cucina",
+                                    "olio motore",
+                                    "olio",
+                                    "ombrello",
+                                    "passeggini",
+                                    "passeggino",
+                                    "pentole cucina",
+                                    "pentole",
+                                    "phon",
+                                    "piante",
+                                    "piastrelle",
+                                    "piatti ceramica",
+                                    "pneumatici",
+                                    "radio",
+                                    "rasoio elettrico",
+                                    "rete metallica letto",
+                                    "rete metallica",
+                                    "rubinetti",
+                                    "scarpe",
+                                    "scopa",
+                                    "sedia",
+                                    "segatura",
+                                    "seggiolone",
+                                    "sfalci e potature",
+                                    "sfalci",
+                                    "sottovaso",
+                                    "spazzolone",
+                                    "specchio",
+                                    "stendino biancheria",
+                                    "stendino",
+                                    "stereo",
+                                    "strumenti musicali",
+                                    "stufetta elettrica",
+                                    "tapparelle",
+                                    "tappeto",
+                                    "tappezzeria",
+                                    "tavolo",
+                                    "teglia ceramica",
+                                    "telecomando",
+                                    "telefonino",
+                                    "telefono",
+                                    "televisore",
+                                    "termometro",
+                                    "vaso terracotta",
+                                    "vernici",
+                                    "zerbino"
+                                ]
+                            }
+                        },
+                        {
+                            "id": "FARM",
+                            "name": {
+                                "value": "FARM",
+                                "synonyms": [
+                                    "farmaci scaduti",
+                                    "farmaci",
+                                    "medicinali scaduti",
+                                    "medicinali"
+                                ]
+                            }
+                        },
+                        {
+                            "id": "LATT",
+                            "name": {
+                                "value": "LATT",
+                                "synonyms": [
+                                    "bomboletta spray",
+                                    "caffettiera",
+                                    "confezioni ferro",
+                                    "imballaggi alluminio",
+                                    "imballaggi ferro",
+                                    "lattina",
+                                    "lattine",
+                                    "pacchetto caffè",
+                                    "scatole alluminio",
+                                    "scatole latta",
+                                    "scatolette alluminio",
+                                    "scatolette latta",
+                                    "tappi metallo",
+                                    "teglia alluminio"
+                                ]
+                            }
+                        },
+                        {
+                            "id": "PILE",
+                            "name": {
+                                "value": "PILE",
+                                "synonyms": [
+                                    "pile"
+                                ]
+                            }
+                        },
+                        {
+                            "id": "PLAS",
+                            "name": {
+                                "value": "PLAS",
+                                "synonyms": [
+                                    "appendiabiti",
+                                    "appendini",
+                                    "bicchieri plastica",
+                                    "borsa plastica",
+                                    "bottiglia plastica",
+                                    "cassette plastica",
+                                    "cellophan",
+                                    "confezioni plastica",
+                                    "confezioni polistirolo",
+                                    "copertina plastica",
+                                    "imballaggi plastica",
+                                    "piatti plastica",
+                                    "polistirolo",
+                                    "sacchetti plastica",
+                                    "sacchetto patatine",
+                                    "scatole plastica",
+                                    "tappi plastica",
+                                    "tubetto",
+                                    "vaschetta polistirolo",
+                                    "vaschette plastica uova",
+                                    "vasetto yogurt",
+                                    "vaso plastica"
+                                ]
+                            }
+                        },
+                        {
+                            "id": "SECC",
+                            "name": {
+                                "value": "SECC",
+                                "synonyms": [
+                                    "accendino",
+                                    "assorbenti",
+                                    "batuffoli cotone",
+                                    "bigiotteria",
+                                    "biro",
+                                    "blister medicine",
+                                    "bottoni plastica",
+                                    "calze nylon",
+                                    "calze",
+                                    "candele",
+                                    "cannucce",
+                                    "capelli",
+                                    "capsule caffè",
+                                    "carta cucina oleata",
+                                    "carta cucina",
+                                    "cartelletta plastica",
+                                    "cassetta musicale",
+                                    "cd",
+                                    "ceretta",
+                                    "cerotti",
+                                    "chewingum",
+                                    "collant",
+                                    "corde",
+                                    "cotton fioc",
+                                    "custodia cassette musicali",
+                                    "custodia cassette",
+                                    "custodia cd",
+                                    "custodie dvd",
+                                    "dvd",
+                                    "elastici",
+                                    "escrementi animali domestici",
+                                    "escrementi animali",
+                                    "escrementi",
+                                    "etichette adesive",
+                                    "etichette",
+                                    "evidenziatore",
+                                    "fazzoletti carta usati",
+                                    "fiammiferi",
+                                    "fiori finti",
+                                    "fotografie",
+                                    "gomma masticare",
+                                    "guanti gomma",
+                                    "guanti usa e getta",
+                                    "gusci cozze",
+                                    "gusci vongole",
+                                    "lamette usa e getta",
+                                    "lamette",
+                                    "lenti contatto",
+                                    "lettiera",
+                                    "lettiere piccoli animali domestici",
+                                    "lettiere",
+                                    "molletta ferro",
+                                    "molletta plastica",
+                                    "molletta",
+                                    "mozzicone sigaretta",
+                                    "mozzicone",
+                                    "nastri",
+                                    "nastro adesivo",
+                                    "occhiali",
+                                    "panni cattura polvere",
+                                    "pannolini",
+                                    "peluche",
+                                    "peluches",
+                                    "penna plastica",
+                                    "penna sfera",
+                                    "pettine plastica",
+                                    "pettine",
+                                    "piastrine zanzare",
+                                    "posate plastica",
+                                    "radiografie",
+                                    "rasoii usa e getta",
+                                    "rasoii",
+                                    "righello",
+                                    "sabbia lettiera animali domestici",
+                                    "sabbia lettiera",
+                                    "sacchetto argentato",
+                                    "sacchetto patatine interno argentato",
+                                    "scontrino",
+                                    "sigaretta",
+                                    "siringhe",
+                                    "smalto flacone",
+                                    "smalto unghie",
+                                    "smalto",
+                                    "spazzola",
+                                    "spazzolino",
+                                    "spugne",
+                                    "stracci",
+                                    "stuzzicadenti",
+                                    "tazzina ceramica",
+                                    "tessere magnetiche",
+                                    "trousse"
+                                ]
+                            }
+                        },
+                        {
+                            "id": "UMID",
+                            "name": {
+                                "value": "UMID",
+                                "synonyms": [
+                                    "alimenti inutilizzati",
+                                    "alimenti scaduti",
+                                    "alimenti",
+                                    "avanzi cucina",
+                                    "biscotti",
+                                    "brioches",
+                                    "bucce frutta",
+                                    "bucce verdura",
+                                    "bustina camomilla",
+                                    "bustina te",
+                                    "bustina thè",
+                                    "caffè",
+                                    "carne",
+                                    "cenere camino",
+                                    "cialda caffè",
+                                    "cialde caffè garza",
+                                    "cozze",
+                                    "filtro camomilla",
+                                    "filtro te",
+                                    "filtro thè",
+                                    "fiori secchi",
+                                    "fiori",
+                                    "fondi caffè",
+                                    "frutta secca",
+                                    "frutta",
+                                    "gusci frutta secca",
+                                    "gusci noci",
+                                    "gusci uova",
+                                    "lische di pesce",
+                                    "noci",
+                                    "ossa",
+                                    "pane",
+                                    "pasta",
+                                    "patatine",
+                                    "pelati",
+                                    "pesce",
+                                    "riso",
+                                    "salumi",
+                                    "tappi di sughero",
+                                    "tovaglioli carta usati sporchi cibo",
+                                    "tovaglioli di carta usati",
+                                    "uova",
+                                    "verdura",
+                                    "vongole",
+                                    "yogurt"
+                                ]
+                            }
+                        },
+                        {
+                            "id": "VETR",
+                            "name": {
+                                "value": "VETR",
+                                "synonyms": [
+                                    "barattoli vetro",
+                                    "bicchieri vetro",
+                                    "bottiglia vetro",
+                                    "confezioni vetro",
+                                    "imballaggi vetro",
+                                    "lampadina",
+                                    "vasetti vetro",
+                                    "vaso vetro",
+                                    "vetro"
+                                ]
+                            }
+                        }
+                    ]
+                }
+            ]
+        }
+    }
+}

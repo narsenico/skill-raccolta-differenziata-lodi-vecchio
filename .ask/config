@@ -1,9 +1,45 @@
 {
   "deploy_settings": {
     "default": {
-      "skill_id": "",
+      "skill_id": "amzn1.ask.skill.8a45b6a6-4785-44b7-8d5e-a9356944d206",
       "was_cloned": false,
-      "merge": {}
+      "merge": {},
+      "resources": {
+        "manifest": {
+          "eTag": "89e630f343739a702abe3aeab1ff583b"
+        },
+        "interactionModel": {
+          "it-IT": {
+            "eTag": "9436488e8626f13cd3341346d2d905b5"
+          }
+        },
+        "lambda": [
+          {
+            "alexaUsage": [
+              "custom/default"
+            ],
+            "arn": "arn:aws:lambda:us-east-1:523687437379:function:ask-custom-skill-raccolta-differenziata-lodi-vecchio-default",
+            "awsRegion": "us-east-1",
+            "codeUri": "lambda/custom",
+            "functionName": "ask-custom-skill-raccolta-differenziata-lodi-vecchio-default",
+            "handler": "index.handler",
+            "revisionId": "1b45f2b7-6808-4793-ad27-27a422c9c162",
+            "runtime": "nodejs8.10"
+          },
+          {
+            "alexaUsage": [
+              "custom/EU"
+            ],
+            "arn": "arn:aws:lambda:eu-west-1:523687437379:function:ask-custom-skill-raccolta-differenziata-lodi-vecchio-default",
+            "awsRegion": "eu-west-1",
+            "codeUri": "lambda/custom",
+            "functionName": "ask-custom-skill-raccolta-differenziata-lodi-vecchio-default",
+            "handler": "index.handler",
+            "revisionId": "7cc4877f-8010-488d-bc80-906712ccbe14",
+            "runtime": "nodejs8.10"
+          }
+        ]
+      }
     }
   }
 }
