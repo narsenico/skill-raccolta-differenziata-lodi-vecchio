@@ -20,13 +20,41 @@ const CARD_TITLE = 'Raccolta differenziata Lodi Vecchio',
   DATE_LONG_FORMAT = 'dddd, D MMMM',
   OUT_SPEAKER = 'speaker',
   OUT_CARD = 'card',
-  // data = require('data.json'),
-  destinations = require('destinations.json'),
-  calendar = require('calendar.json'),
-  rcalendar = reveserCalendar(),
-  rgPlural = /^(i|gli|le)$/i
-  // , rgParticles = /\b(a|il|lo|la|l'|i|gli|le|un|uno|una|un'|di|del|della|dell'|delle|degli|al|in|da|per|\d+)\b/g
-  ;
+  MATERIALS = require('materials.json'),
+  CALENDAR = require('calendar.json'),
+  RCALENDAR = reveserCalendar(),
+  rgPlural = /^(i|gli|le)$/i;
+
+const COMPOSER = {
+  [OUT_SPEAKER]: {
+    phrase(string) {
+      return `<s>${string}</s>`;
+    },
+    list(string) {
+      return `<s>${string}</s>`;
+    },
+    break(ms) {
+      return `<break time="${ms}ms"/>`;
+    },
+    emphasis(string, level = 'moderate') {
+      return `<emphasis level="${level}">${string}</emphasis>`;
+    }
+  },
+  [OUT_CARD]: {
+    phrase(string) {
+      return `${string}\n`;
+    },
+    list(string) {
+      return `* ${string}\n`;
+    },
+    break() {
+      return '\n';
+    },
+    emphasis(string, level) {
+      return `"${string}"`;
+    }
+  }
+}
 
 /**
 * 
@@ -91,68 +119,6 @@ function getSlotValues(filledSlots) {
   return slotValues;
 }
 
-// /**
-//  * Cerca un materiale da differenziare e ne ritorna la destinazione.
-//  * TODO: ritornare un costrutto non formattato, in modo che possa essere poi formattato per la card o lo speaker
-//  * 
-//  * @param {String} query frase di ricerca
-//  * @returns la frase in output già formattata per lo speaker
-//  */
-// function execWhere(query) {
-//   if (query) {
-//     // normalizzo la query
-//     // - elimino le particelle grammaticali
-//     // - elimino gli spazi multipli
-//     // - trim
-//     // TODO: sostituire lettere accentate? (anche in data.json)
-//     // TODO: come gestire singolare/plurale? barattolo/barattoli
-//     const normalizedQuery = query
-//       .replace(rgParticles, '')
-//       .replace(/\s{2,}/g, ' ')
-//       .trim();
-//     let resp;
-//     if (data[normalizedQuery]) {
-//       resp = [data[normalizedQuery]];
-//     } /* else {
-//       NO! questo metodo può generare dei falsi (es "sacchetti di patatine" => "patatine" => "umido")
-//       // se non trovo la query provo a cercare le singole parole
-//       // TODO: concatenare meglio le risposte
-//       resp = normalizedQuery
-//         .split(/\s+/)
-//         .map(w => data[w])
-//         .filter(r => r);
-//     } */
-//     if (resp.length > 0) {
-//       resp = resp.reduce((m, p) => {
-//         if (typeof (p) === 'string') {
-//           // se è una stringa allora è una chiave destinazione
-//           m[m.length] = destinations[p];
-//         } else {
-//           // altrimenti è un oggetto le cui chiavi si riferiscono alla destinazione
-//           //  e il valore descrive una variante del rifiuto cercato
-//           //  per ogni variante compongo la frase "<destinazione>, per <variante>"
-//           //  es: "carta e cartone, per le vaschette di cartone per uova"
-//           Object.keys(p).reduce((m, k) => {
-//             m[m.length] = `${destinations[k]}, per ${p[k]}`;
-//             return m;
-//           }, m);
-//         }
-//         return m;
-//       }, []);
-//       if (resp.length === 1) {
-//         return resp[0];
-//       } else {
-//         return resp.map(r => `<s>${r}</s>`).join(' ');
-//       }
-//     } else {
-//       // return `DEBUG: ${query} => ${normalizedQuery}`;
-//       return destinations['?'];
-//     }
-//   } else {
-//     return 'Non mi hai chiesto nulla.';
-//   }
-// }
-
 /**
  * 
  * @param {Strign} idGarbage id rifiuto
@@ -162,30 +128,30 @@ function getSlotValues(filledSlots) {
  * @returns la frase in output già formattata in base alla destinazione
  */
 function execWhere(idGarbage, article, garbage, outDest) {
-  const fnPhrase = outDest == OUT_SPEAKER ? toSpeakPhrase : toCardPhrase;
-  const dest = destinations[idGarbage];
+  const C = COMPOSER[outDest];
+  const dest = MATERIALS[idGarbage];
   const sp = rgPlural.test(article) ? 'vanno' : 'va';
   console.log("WHERE", idGarbage, article, garbage, sp, JSON.stringify(dest));
   if (dest) {
-    return fnPhrase(`${article} ${garbage} ${sp} ${dest.where}`);
+    return C.phrase(`${article} ${garbage} ${sp} ${dest.where}`);
   } else {
-    return fnPhrase(`Mi spiace, non so dove buttare ${article} ${garbage}, prova a conttatare il comune`);
+    return C.phrase(`Mi spiace, non so dove buttare ${article} ${garbage}, prova a conttatare il comune`);
   }
 }
 
 /**
  * Dato il codice materiale ritorna il giorno di ritiro.
  * 
- * @param {String} idMaterial vedi chiavi in destinations.json
+ * @param {String} idMaterial vedi chiavi in materials.json
  * @param {OUT_SPEAKER|OUT_CARD} outDest  destinazione
  * @returns la frase in output già formattata in base alla destinazione
  */
 function execWhen(idMaterial, outDest) {
-  const fnPhrase = outDest == OUT_SPEAKER ? toSpeakPhrase : toCardPhrase;
+  const C = COMPOSER[outDest];
   const today = moment();
   const stoday = today.format(DATE_FORMAT);
   const stomorrow = moment().add(1, 'days').format(DATE_FORMAT);
-  const dates = calendar[idMaterial];
+  const dates = CALENDAR[idMaterial];
   if (dates && dates.length > 0) {
     // cerco una data di ritiro maggiore o uguale a oggi/domani (in base all'ora)
     // TODO: recuperare la timezone 
@@ -198,20 +164,20 @@ function execWhen(idMaterial, outDest) {
       'found', found);
     if (found) {
       if (found === stoday) {
-        return fnPhrase('Il ritiro è previsto per oggi, entro le ore sei del mattino');
+        return C.phrase('Il ritiro è previsto per oggi, entro le ore sei del mattino');
       } else if (found === stomorrow) {
-        return fnPhrase('Il ritiro è previsto per domani');
+        return C.phrase('Il ritiro è previsto per domani');
       } else {
-        return fnPhrase(`Il ritiro è previsto per
+        return C.phrase(`Il ritiro è previsto per
           ${moment(found).locale('it').format(DATE_LONG_FORMAT)}`);
       }
     } else {
       // il materiale è censito, ma non sono state trovate date utili
-      return fnPhrase(`Non sono state trovate date utili per il ritiro del materiale indicato,
+      return C.phrase(`Non sono state trovate date utili per il ritiro del materiale indicato,
         per maggiori informazioni contattare il comune.`);
     }
   }
-  return fnPhrase(`Non è previsto alcun ritiro per il materiale indicato, 
+  return C.phrase(`Non è previsto alcun ritiro per il materiale indicato, 
     contattare il comune per maggiori informazioni.`);
 }
 
@@ -223,28 +189,55 @@ function execWhen(idMaterial, outDest) {
  * @returns la frase in output già formattata in base alla destinazione
  */
 function execWhat(dates, outDest) {
-  const fnList = outDest == OUT_SPEAKER ? toSpeakPhrase : toCardList;
-  const fnPhrase = outDest == OUT_SPEAKER ? toSpeakPhrase : toCardPhrase;
+  const C = COMPOSER[outDest];
   const stoday = moment().format(DATE_FORMAT);
-  let materials;
+  let materialsPerDate;
   let output = '';
   for (let ii = 0; ii < dates.length; ii++) {
-    materials = rcalendar[dates[ii]];
-    console.log('WHAT', dates[ii], materials);
-    if (materials) {
-      output += fnList(`${dates[ii] === stoday ? 'Oggi' : moment(dates[ii]).locale('it').format(DATE_LONG_FORMAT)},
-        ritirano ${humanJoin(materials.map(m => destinations[m].what))}`);
+    materialsPerDate = RCALENDAR[dates[ii]];
+    console.log('WHAT', dates[ii], materialsPerDate);
+    if (materialsPerDate) {
+      output += C.list(`${dates[ii] === stoday ? 'Oggi' : moment(dates[ii]).locale('it').format(DATE_LONG_FORMAT)},
+        ritirano ${humanJoin(materialsPerDate.map(m => MATERIALS[m].what))}`);
     }
   }
   if (output) {
     if (Math.random() >= .5) {
-      return output + fnPhrase('Ricordati che devi esporre i rifiuti entro le ore sei');
+      return output + C.phrase('Ricordati che devi esporre i rifiuti entro le ore sei');
     } else {
       return output;
     }
   } else {
-    return fnPhrase('Non è previsto alcun ritiro');
+    return C.phrase('Non è previsto alcun ritiro');
   }
+}
+
+/**
+ * Dato il codice materiale ne ritorna le informazioni.
+ * 
+ * @param {String} idMaterial vedi chiavi in materials.json
+ * @param {OUT_SPEAKER|OUT_CARD} outDest  destinazione
+ * @returns la frase in output già formattata in base alla destinazione
+ */
+function execInfo(idMaterial, outDest) {
+  const C = COMPOSER[outDest];
+  const material = MATERIALS[idMaterial];
+  console.log('INFO', idMaterial, material);
+  let output = '';
+  if (material) {
+    if (material.samples) {
+      output += C.phrase(`Ecco alcuni esempi di rifiuti per la tipologia ${material.name}:`);
+      output = material.samples.reduce((m, p) => {
+        return m += C.phrase(p);
+      }, output);
+      output += C.break(250);
+    }
+    if (material.help) {
+      output += C.phrase(material.help);
+    }
+  }
+  return output || 
+    C.phrase(`Mi spiace, non ho informazioni su questa tipologia di rifiuti.`);
 }
 
 /**
@@ -314,18 +307,6 @@ function nextDay(dayOfWeek) {
   }
 }
 
-function toSpeakPhrase(string) {
-  return `<s>${string}</s>`;
-}
-
-function toCardPhrase(string) {
-  return `${string}.\n`;
-}
-
-function toCardList(string) {
-  return `* ${string}\n`;
-}
-
 function humanJoin(phrases) {
   if (phrases.length === 1) {
     return phrases[0];
@@ -337,8 +318,8 @@ function humanJoin(phrases) {
 }
 
 function reveserCalendar() {
-  return Object.keys(calendar).reduce((m, k) => {
-    return calendar[k].reduce((m, d) => {
+  return Object.keys(CALENDAR).reduce((m, k) => {
+    return CALENDAR[k].reduce((m, d) => {
       (m[d] || (m[d] = [])).push(k);
       return m;
     }, m);
@@ -350,8 +331,9 @@ const LaunchRequestHandler = {
     return handlerInput.requestEnvelope.request.type === 'LaunchRequest';
   },
   handle(handlerInput) {
-    const speechText = `Benvenuto in raccolta differenziata Lodi Vecchio. 
-      <s>Chiedi aiuto per scoprire tutte le funzionalità di questa skill</s>`;
+    const speechText = `<s>Benvenuto in raccolta differenziata Lodi Vecchio.</s> 
+      <s>Chiedi aiuto per scoprire tutte le funzionalità di questa skill,
+      oppure fammi una domanda.</s>`;
 
     return handlerInput.responseBuilder
       .speak(speechText)
@@ -469,6 +451,37 @@ const WhatIntent = {
   }
 }
 
+/**
+ * Intenet per chiedere informazioni sulla tipologia di un rifiuto.
+ * 
+ * Slots:
+ * - {article} articolo, non utilizzato
+ * - {preposition} preposizione, non utilizzato
+ * - {material} tipologia del rifiuto
+ */
+const InfoIntent = {
+  canHandle(handlerInput) {
+    return handlerInput.requestEnvelope.request.type === 'IntentRequest'
+      && handlerInput.requestEnvelope.request.intent.name === 'InfoIntent';
+  },
+  handle(handlerInput) {
+    const responseBuilder = handlerInput.responseBuilder;
+    const filledSlots = handlerInput.requestEnvelope.request.intent.slots;
+    const slotValues = getSlotValues(filledSlots);
+    if (slotValues.material && slotValues.material.id) {
+      responseBuilder
+        .speak(execInfo(slotValues.material.id, OUT_SPEAKER))
+        .withSimpleCard(CARD_TITLE, execInfo(slotValues.material.id, OUT_CARD));
+    } else {
+      responseBuilder
+        .speak('Ripeti la tipologia dei rifiuti per favore.')
+        .addElicitSlotDirective('material');
+    }
+    return responseBuilder
+      .getResponse();
+  }
+}
+
 const HelpIntentHandler = {
   canHandle(handlerInput) {
     return handlerInput.requestEnvelope.request.type === 'IntentRequest'
@@ -480,11 +493,12 @@ const HelpIntentHandler = {
       oppure
       <s>quando ritirano la plastica?</s>
       o ancora
-      <s>cosa ritirano domani?</s>`;
+      <s>cosa ritirano domani?</s>
+      e infine
+      <s>cosa butto nella plastica?</s>`;
 
     return handlerInput.responseBuilder
       .speak(speechText)
-      .reprompt(speechText)
       .getResponse();
   },
 };
@@ -526,7 +540,7 @@ const ErrorHandler = {
     return handlerInput.responseBuilder
       .speak('Scusa, non ho capito.')
       .reprompt('Scusa, non ho capito.')
-      .withSimpleCard('ERROR', error.message)
+      // .withSimpleCard('ERROR', error.message)
       .getResponse();
   },
 };
@@ -539,6 +553,7 @@ exports.handler = skillBuilder
     WhereIntent,
     WhenIntent,
     WhatIntent,
+    InfoIntent,
     HelpIntentHandler,
     CancelAndStopIntentHandler,
     SessionEndedRequestHandler

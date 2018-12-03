@@ -1,0 +1,83 @@
+{
+    "CART": {
+        "name": "Carta e Cartone",
+        "where": "in Carta e Cartone",
+        "what": "la Carta e il Cartone",
+        "samples": [
+            "Giornali, riviste, libri, sacchetti di carta, cartoni da imballaggio, scatole, contenitori in tetra pak (come quelli del latte e dei succhi)."
+        ],
+        "help": "Ricorda di esporre carta e cartone, raccolti in sacchetti di carta, o in cartoni."
+    },
+    "CRAP": {
+        "where": "al Centro di Raccolta",
+        "what": "Centro di Raccolta"
+    },
+    "CRAC": {
+        "where": "a Humana o Caritas, oppure al Centro di Raccolta",
+        "what": "Humana o Caritas / Centro di Raccolta"
+    },
+    "FARM": {
+        "name": "Farmaci",
+        "where": "nei Contenitori per Farmaci",
+        "what": "Contenitori per Farmaci",
+        "help": "I farmaci sono da buttare negli appositi contenitori stradali."
+    },
+    "LATT": {
+        "name": "Lattine e Scatolame",
+        "where": "in Lattine e Scatolame",
+        "what": "Lattine e Scatolame",
+        "samples": [
+            "Tutti i contenitori in alluminio (come lattine o barattoli).",
+            "In generale i contenitori con i simboli <say-as interpret-as=\"spell-out\">ACC</say-as>, e <say-as interpret-as=\"spell-out\">AL</say-as>."
+        ],
+        "help": "Ricorda di raccogliere insieme vetro e lattine negli appositi contenitori."
+    },
+    "PLAS": {
+        "name": "Plastica",
+        "where": "nella Plastica",
+        "what": "la Plastica",
+        "samples": [
+            "Bottiglie, piatti e bicchieri di plastica, imballaggi, flaconi per detergenti e prodotti liquidi.",
+            "Film, e in generale gli imballaggi e i contenitori con i simboli <say-as interpret-as=\"spell-out\">PE</say-as>, <say-as interpret-as=\"spell-out\">PET</say-as>, <say-as interpret-as=\"spell-out\">PCV</say-as>."
+        ],
+        "help": "Ricorda di raccogliere la plastica in sacchi di plastica trasparenti."
+    },
+    "PILE": {
+        "name": "Pile",
+        "where": "nei Contenitori Stradali per Pile",
+        "what": "Contenitori Stradali per Pile",
+        "help": "Le pile sono da buttare negli appositi contenitori stradali."
+    },
+    "SECC": {
+        "name": "Secco",
+        "where": "nel Secco",
+        "what": "il Secco",
+        "samples": [
+            "Gomma, CD, lettiere animali domestici, posate di plastica usa e getta.",
+            "Carta oleata e plastificata, ceramica.",
+            "Pannolini e in generale ciò che non rientra nella raccolta di vetro, lattine, plastica, carta e umido."
+        ],
+        "help": "Ricorda di raccogliere il secco in sacchi di plastica trasparenti."
+    },
+    "UMID": {
+        "name": "Umido",
+        "where": "nel Umido",
+        "what": "l'Umido",
+        "samples": [
+            "Avanzi di pesce, ossa, resti di frutta e verdura.",
+            "Tovaglioli, fazzolettini, bustine di thè e simili.",
+            "Resti di fondi di caffè, uova, formaggio.",
+            "Segatura, ceneri fredde, fiori recisi, cibi scaduti privati della confezione, e tutto ciò che è organico."
+        ],
+        "help": "Ricarda di raccogliere l'umido in sacchetti biodegradabili e compostabili, da riporre negli appositi contenitori."
+    },
+    "VETR": {
+        "name": "Vetro",
+        "where": "nel Vetro",
+        "what": "il Vetro",
+        "samples": [
+            "Tutti i contenitori in vetro come le bottiglie, i bicchieri, i vasetti per alimenti."
+        ],
+        "help": "Ricorda di raccogliere insieme vetro e lattine negli appositi contenitori."
+    }
+}
