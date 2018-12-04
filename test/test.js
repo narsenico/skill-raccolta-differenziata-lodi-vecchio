@@ -3,6 +3,7 @@
  * test con mocha e chai
  * 
  * mocha test.js --reporter list
+ * mocha test.js --reporter markdown > README.md
  * 
  * @see https://github.com/BrianMacIntosh/alexa-skill-test-framework/blob/master/examples/skill-sample-nodejs-hello-world/helloworld-tests.js
  */

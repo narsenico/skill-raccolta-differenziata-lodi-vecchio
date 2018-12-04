@@ -278,7 +278,7 @@ run(index.handler, 0, {});
 
 <a name="raccolta-differenziata-whereintent"></a>
 ## WhereIntent
-valigie -> a Humana o Caritas, oppure al Centro di Raccolta.
+telefono -> al Centro di Raccolta.
 
 ```js
 const slotWithSynonym = { 'garbage': synonim };
@@ -301,7 +301,7 @@ alexaTest.test([
 ]);
 ```
 
-lattina -> in Lattine e Scatolame.
+cinture -> a Humana o Caritas, oppure al Centro di Raccolta.
 
 ```js
 const slotWithSynonym = { 'garbage': synonim };
@@ -324,122 +324,7 @@ alexaTest.test([
 ]);
 ```
 
-block notes -> in Carta e Cartone.
-
-```js
-const slotWithSynonym = { 'garbage': synonim };
-const requestWithEntityResolution = alexaTest.addEntityResolutionToRequest(
-    alexaTest.getIntentRequest('WhereIntent', slotWithSynonym),
-    'garbage',
-    'TYPE_GARBAGE',
-    tg.name.value,
-    tg.id
-);
-alexaTest.test([
-    {
-        request: requestWithEntityResolution,
-        repromptsNothing: true,
-        shouldEndSession: true,
-        saysCallback(context, speech) {
-            expect(speech).contains(dest);
-        }
-    }
-]);
-```
-
-assorbenti -> nel Secco.
-
-```js
-const slotWithSynonym = { 'garbage': synonim };
-const requestWithEntityResolution = alexaTest.addEntityResolutionToRequest(
-    alexaTest.getIntentRequest('WhereIntent', slotWithSynonym),
-    'garbage',
-    'TYPE_GARBAGE',
-    tg.name.value,
-    tg.id
-);
-alexaTest.test([
-    {
-        request: requestWithEntityResolution,
-        repromptsNothing: true,
-        shouldEndSession: true,
-        saysCallback(context, speech) {
-            expect(speech).contains(dest);
-        }
-    }
-]);
-```
-
-polistirolo -> nella Plastica.
-
-```js
-const slotWithSynonym = { 'garbage': synonim };
-const requestWithEntityResolution = alexaTest.addEntityResolutionToRequest(
-    alexaTest.getIntentRequest('WhereIntent', slotWithSynonym),
-    'garbage',
-    'TYPE_GARBAGE',
-    tg.name.value,
-    tg.id
-);
-alexaTest.test([
-    {
-        request: requestWithEntityResolution,
-        repromptsNothing: true,
-        shouldEndSession: true,
-        saysCallback(context, speech) {
-            expect(speech).contains(dest);
-        }
-    }
-]);
-```
-
-rubinetti -> al Centro di Raccolta.
-
-```js
-const slotWithSynonym = { 'garbage': synonim };
-const requestWithEntityResolution = alexaTest.addEntityResolutionToRequest(
-    alexaTest.getIntentRequest('WhereIntent', slotWithSynonym),
-    'garbage',
-    'TYPE_GARBAGE',
-    tg.name.value,
-    tg.id
-);
-alexaTest.test([
-    {
-        request: requestWithEntityResolution,
-        repromptsNothing: true,
-        shouldEndSession: true,
-        saysCallback(context, speech) {
-            expect(speech).contains(dest);
-        }
-    }
-]);
-```
-
-bottiglia di vetro -> nel Vetro.
-
-```js
-const slotWithSynonym = { 'garbage': synonim };
-const requestWithEntityResolution = alexaTest.addEntityResolutionToRequest(
-    alexaTest.getIntentRequest('WhereIntent', slotWithSynonym),
-    'garbage',
-    'TYPE_GARBAGE',
-    tg.name.value,
-    tg.id
-);
-alexaTest.test([
-    {
-        request: requestWithEntityResolution,
-        repromptsNothing: true,
-        shouldEndSession: true,
-        saysCallback(context, speech) {
-            expect(speech).contains(dest);
-        }
-    }
-]);
-```
-
-abiti in buono stato -> a Humana o Caritas, oppure al Centro di Raccolta.
+custodia per cassette -> nel Secco.
 
 ```js
 const slotWithSynonym = { 'garbage': synonim };
@@ -485,7 +370,122 @@ alexaTest.test([
 ]);
 ```
 
-pile -> nei Contenitori Stradali per Pile.
+fogli di carta -> in Carta e Cartone.
+
+```js
+const slotWithSynonym = { 'garbage': synonim };
+const requestWithEntityResolution = alexaTest.addEntityResolutionToRequest(
+    alexaTest.getIntentRequest('WhereIntent', slotWithSynonym),
+    'garbage',
+    'TYPE_GARBAGE',
+    tg.name.value,
+    tg.id
+);
+alexaTest.test([
+    {
+        request: requestWithEntityResolution,
+        repromptsNothing: true,
+        shouldEndSession: true,
+        saysCallback(context, speech) {
+            expect(speech).contains(dest);
+        }
+    }
+]);
+```
+
+medicinali scaduti -> nei Contenitori per Farmaci.
+
+```js
+const slotWithSynonym = { 'garbage': synonim };
+const requestWithEntityResolution = alexaTest.addEntityResolutionToRequest(
+    alexaTest.getIntentRequest('WhereIntent', slotWithSynonym),
+    'garbage',
+    'TYPE_GARBAGE',
+    tg.name.value,
+    tg.id
+);
+alexaTest.test([
+    {
+        request: requestWithEntityResolution,
+        repromptsNothing: true,
+        shouldEndSession: true,
+        saysCallback(context, speech) {
+            expect(speech).contains(dest);
+        }
+    }
+]);
+```
+
+etichette adesive -> nel Secco.
+
+```js
+const slotWithSynonym = { 'garbage': synonim };
+const requestWithEntityResolution = alexaTest.addEntityResolutionToRequest(
+    alexaTest.getIntentRequest('WhereIntent', slotWithSynonym),
+    'garbage',
+    'TYPE_GARBAGE',
+    tg.name.value,
+    tg.id
+);
+alexaTest.test([
+    {
+        request: requestWithEntityResolution,
+        repromptsNothing: true,
+        shouldEndSession: true,
+        saysCallback(context, speech) {
+            expect(speech).contains(dest);
+        }
+    }
+]);
+```
+
+cartone -> in Carta e Cartone.
+
+```js
+const slotWithSynonym = { 'garbage': synonim };
+const requestWithEntityResolution = alexaTest.addEntityResolutionToRequest(
+    alexaTest.getIntentRequest('WhereIntent', slotWithSynonym),
+    'garbage',
+    'TYPE_GARBAGE',
+    tg.name.value,
+    tg.id
+);
+alexaTest.test([
+    {
+        request: requestWithEntityResolution,
+        repromptsNothing: true,
+        shouldEndSession: true,
+        saysCallback(context, speech) {
+            expect(speech).contains(dest);
+        }
+    }
+]);
+```
+
+piatti di plastica -> nella Plastica.
+
+```js
+const slotWithSynonym = { 'garbage': synonim };
+const requestWithEntityResolution = alexaTest.addEntityResolutionToRequest(
+    alexaTest.getIntentRequest('WhereIntent', slotWithSynonym),
+    'garbage',
+    'TYPE_GARBAGE',
+    tg.name.value,
+    tg.id
+);
+alexaTest.test([
+    {
+        request: requestWithEntityResolution,
+        repromptsNothing: true,
+        shouldEndSession: true,
+        saysCallback(context, speech) {
+            expect(speech).contains(dest);
+        }
+    }
+]);
+```
+
+bottiglia di vetro -> nel Vetro.
 
 ```js
 const slotWithSynonym = { 'garbage': synonim };
