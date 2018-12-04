@@ -20,8 +20,8 @@ const CARD_TITLE = 'Raccolta differenziata Lodi Vecchio',
   DATE_LONG_FORMAT = 'dddd, D MMMM',
   OUT_SPEAKER = 'speaker',
   OUT_CARD = 'card',
-  MATERIALS = require('materials.json'),
-  CALENDAR = require('calendar.json'),
+  MATERIALS = require('./materials.json'),
+  CALENDAR = require('./calendar.json'),
   RCALENDAR = reveserCalendar(),
   rgPlural = /^(i|gli|le)$/i;
 
@@ -77,7 +77,7 @@ function getSlotValue(slot, def) {
 function getSlotValues(filledSlots) {
   const slotValues = {};
 
-  console.log(`The filled slots: ${JSON.stringify(filledSlots)}`);
+  log(`The filled slots: ${JSON.stringify(filledSlots)}`);
   Object.keys(filledSlots).forEach((item) => {
     const name = filledSlots[item].name;
 
@@ -115,7 +115,7 @@ function getSlotValues(filledSlots) {
       };
     }
   }, this);
-  console.log(`Slot values: ${JSON.stringify(slotValues)}`);
+  log(`Slot values: ${JSON.stringify(slotValues)}`);
   return slotValues;
 }
 
@@ -131,7 +131,7 @@ function execWhere(idGarbage, article, garbage, outDest) {
   const C = COMPOSER[outDest];
   const dest = MATERIALS[idGarbage];
   const sp = rgPlural.test(article) ? 'vanno' : 'va';
-  console.log("WHERE", idGarbage, article, garbage, sp, JSON.stringify(dest));
+  log('WHERE', idGarbage, article, garbage, sp, JSON.stringify(dest));
   if (dest) {
     return C.phrase(`${article} ${garbage} ${sp} ${dest.where}`);
   } else {
@@ -159,7 +159,7 @@ function execWhen(idMaterial, outDest) {
     //  access token e device id sono in handlerInput.requestEnvelope
     const refdate = today.tz('Europe/Rome').hour() > 6 ? stomorrow : stoday;
     const found = dates.find(d => d >= refdate);
-    console.log('WHEN hh', today.tz('Europe/Rome').hour(),
+    log('WHEN hh', today.tz('Europe/Rome').hour(),
       'ref', refdate,
       'found', found);
     if (found) {
@@ -195,7 +195,7 @@ function execWhat(dates, outDest) {
   let output = '';
   for (let ii = 0; ii < dates.length; ii++) {
     materialsPerDate = RCALENDAR[dates[ii]];
-    console.log('WHAT', dates[ii], materialsPerDate);
+    log('WHAT', dates[ii], materialsPerDate);
     if (materialsPerDate) {
       output += C.list(`${dates[ii] === stoday ? 'Oggi' : moment(dates[ii]).locale('it').format(DATE_LONG_FORMAT)},
         ritirano ${humanJoin(materialsPerDate.map(m => MATERIALS[m].what))}`);
@@ -222,7 +222,7 @@ function execWhat(dates, outDest) {
 function execInfo(idMaterial, outDest) {
   const C = COMPOSER[outDest];
   const material = MATERIALS[idMaterial];
-  console.log('INFO', idMaterial, material);
+  log('INFO', idMaterial, material);
   let output = '';
   if (material) {
     if (material.samples) {
@@ -326,18 +326,23 @@ function reveserCalendar() {
   }, {});
 }
 
+function log() {
+  if (!process.env.NO_DEBUG) {
+    console.log.apply(null, arguments);
+  }
+}
+
 const LaunchRequestHandler = {
   canHandle(handlerInput) {
     return handlerInput.requestEnvelope.request.type === 'LaunchRequest';
   },
   handle(handlerInput) {
-    const speechText = `<s>Benvenuto in raccolta differenziata Lodi Vecchio.</s> 
-      <s>Chiedi aiuto per scoprire tutte le funzionalità di questa skill,
-      oppure fammi una domanda.</s>`;
+    log('NO_DEBUG', process.env.NO_DEBUG);
 
     return handlerInput.responseBuilder
-      .speak(speechText)
-      .reprompt(speechText)
+      .speak(`<s>Benvenuto in raccolta differenziata Lodi Vecchio</s>
+              <s>Cosa vuoi sapere?</s>`)
+      .reprompt('Per scoprire tutte le funzionalità di questa skill, chiedi aiuto!')
       .getResponse();
   },
 };
@@ -524,7 +529,7 @@ const SessionEndedRequestHandler = {
     return handlerInput.requestEnvelope.request.type === 'SessionEndedRequest';
   },
   handle(handlerInput) {
-    console.log(`Session ended with reason: ${handlerInput.requestEnvelope.request.reason}`);
+    log(`Session ended with reason: ${handlerInput.requestEnvelope.request.reason}`);
 
     return handlerInput.responseBuilder.getResponse();
   },
@@ -535,7 +540,7 @@ const ErrorHandler = {
     return true;
   },
   handle(handlerInput, error) {
-    console.log(`Error handled: ${error.message}`);
+    log(`Error handled: ${error.message}`);
 
     return handlerInput.responseBuilder
       .speak('Scusa, non ho capito.')
