@@ -10,8 +10,6 @@
  */
 
 const Alexa = require('ask-sdk-core');
-// const dayjs = require('dayjs');
-// const dayjs_it = require('dayjs/locale/it');
 const moment = require('moment-timezone');
 
 const CARD_TITLE = 'Raccolta differenziata Lodi Vecchio',
@@ -27,8 +25,11 @@ const CARD_TITLE = 'Raccolta differenziata Lodi Vecchio',
 
 const COMPOSER = {
   [OUT_SPEAKER]: {
-    phrase(string) {
-      return `<s>${string}</s>`;
+    phrase(...strings) {
+      return strings.reduce((m, p) => {
+        return m += `<s>${p}</s>`
+      }, '');
+      // return `<s>${string}</s>`;
     },
     list(string) {
       return `<s>${string}</s>`;
@@ -38,6 +39,9 @@ const COMPOSER = {
     },
     emphasis(string, level = 'moderate') {
       return `<emphasis level="${level}">${string}</emphasis>`;
+    },
+    prosody(string, { rate = '100%', pitch = '+0%', volume = '+0dB' }) {
+      return `<prosody rate="${rate}" pitch="${pitch}" volume="${volume}">${string}</prosody>`;
     }
   },
   [OUT_CARD]: {
@@ -52,20 +56,11 @@ const COMPOSER = {
     },
     emphasis(string, level) {
       return `"${string}"`;
+    },
+    prosody(string, { rate, pitch, volume }) {
+      return string;
     }
   }
-}
-
-/**
-* 
-* @param {Object} slot slot da cui estrarre il valore
-* @param {Any} def valore di default nel caso lo slot non ne contenga
-* @returns valore dello slot o def se non ne contiene (compreso null e undefined)
-*/
-function getSlotValue(slot, def) {
-  if (!slot) return def;
-  if (slot.value === undefined || slot.value === null) return def;
-  return slot.value;
 }
 
 /**
@@ -151,6 +146,7 @@ function execWhen(idMaterial, outDest) {
   const today = moment();
   const stoday = today.format(DATE_FORMAT);
   const stomorrow = moment().add(1, 'days').format(DATE_FORMAT);
+  const material = MATERIALS[idMaterial];
   const dates = CALENDAR[idMaterial];
   if (dates && dates.length > 0) {
     // cerco una data di ritiro maggiore o uguale a oggi/domani (in base all'ora)
@@ -164,11 +160,11 @@ function execWhen(idMaterial, outDest) {
       'found', found);
     if (found) {
       if (found === stoday) {
-        return C.phrase('Il ritiro è previsto per oggi, entro le ore sei del mattino');
+        return C.phrase(`Il ritiro ${material.when} è previsto per oggi, entro le ore sei del mattino`);
       } else if (found === stomorrow) {
-        return C.phrase('Il ritiro è previsto per domani');
+        return C.phrase(`Il ritiro ${material.when} è previsto per domani`);
       } else {
-        return C.phrase(`Il ritiro è previsto per
+        return C.phrase(`Il ritiro ${material.when} è previsto per
           ${moment(found).locale('it').format(DATE_LONG_FORMAT)}`);
       }
     } else {
@@ -177,8 +173,12 @@ function execWhen(idMaterial, outDest) {
         per maggiori informazioni contattare il comune.`);
     }
   }
-  return C.phrase(`Non è previsto alcun ritiro per il materiale indicato, 
-    contattare il comune per maggiori informazioni.`);
+  if (material && material.help) {
+    return C.phrase('Non è previsto alcun ritiro.', ...material.help);
+  } else {
+    return C.phrase(`Non è previsto alcun ritiro per il materiale indicato, 
+      contattare il comune per maggiori informazioni.`);
+  }
 }
 
 /**
@@ -191,25 +191,43 @@ function execWhen(idMaterial, outDest) {
 function execWhat(dates, outDest) {
   const C = COMPOSER[outDest];
   const stoday = moment().format(DATE_FORMAT);
+  const stomorrow = moment().add(1, 'days').format(DATE_FORMAT);
   let materialsPerDate;
   let output = '';
   for (let ii = 0; ii < dates.length; ii++) {
     materialsPerDate = RCALENDAR[dates[ii]];
     log('WHAT', dates[ii], materialsPerDate);
     if (materialsPerDate) {
-      output += C.list(`${dates[ii] === stoday ? 'Oggi' : moment(dates[ii]).locale('it').format(DATE_LONG_FORMAT)},
-        ritirano ${humanJoin(materialsPerDate.map(m => MATERIALS[m].what))}`);
+      if (dates[ii] === stoday) {
+        output += C.list(`Oggi ritirano ${humanJoin(materialsPerDate.map(m => MATERIALS[m].what))}`);
+      } else if (dates[ii] === stomorrow) {
+        output += C.list(`Domani, ${moment(dates[ii]).locale('it').format(DATE_LONG_FORMAT)},
+          ritirano ${humanJoin(materialsPerDate.map(m => MATERIALS[m].what))}`);
+      } else {
+        output += C.list(`${moment(dates[ii]).locale('it').format(DATE_LONG_FORMAT)},
+          ritirano ${humanJoin(materialsPerDate.map(m => MATERIALS[m].what))}`);
+      }
     }
   }
   if (output) {
     if (Math.random() >= .5) {
-      return output + C.phrase('Ricordati che devi esporre i rifiuti entro le ore sei');
-    } else {
-      return output;
+      output + C.phrase('Ricordati che devi esporre i rifiuti entro le ore sei');
     }
   } else {
-    return C.phrase('Non è previsto alcun ritiro');
+    if (dates.length === 1) {
+      if (dates[0] === stoday) {
+        output = C.phrase('Per oggi non è previsto alcun ritiro');
+      } else if (dates[0] === stomorrow) {
+        output = C.phrase('Per domani non è previsto alcun ritiro');
+      } else {
+        output = C.phrase(`${moment(dates[0]).locale('it').format(DATE_LONG_FORMAT)}, 
+          non è previsto alcun ritiro`);
+      }
+    } else {
+      output = C.phrase('Per il periodo indicato, non è previsto alcun ritiro');
+    }
   }
+  return output;
 }
 
 /**
@@ -233,10 +251,10 @@ function execInfo(idMaterial, outDest) {
       output += C.break(250);
     }
     if (material.help) {
-      output += C.phrase(material.help);
+      output += C.phrase(...material.help);
     }
   }
-  return output || 
+  return output ||
     C.phrase(`Mi spiace, non ho informazioni su questa tipologia di rifiuti.`);
 }
 
@@ -338,11 +356,11 @@ const LaunchRequestHandler = {
   },
   handle(handlerInput) {
     log('NO_DEBUG', process.env.NO_DEBUG);
-
+    const C = COMPOSER[OUT_SPEAKER];
     return handlerInput.responseBuilder
-      .speak(`<s>Benvenuto in raccolta differenziata Lodi Vecchio</s>
-              <s>Cosa vuoi sapere?</s>`)
-      .reprompt('Per scoprire tutte le funzionalità di questa skill, chiedi aiuto!')
+      .speak(C.phrase(`Benvenuto in raccolta differenziata Lodi Vecchio,
+              cosa vuoi sapere.?`))
+      .reprompt('Per scoprire tutte le funzionalità di questa skill, prova a chiedere aiuto!')
       .getResponse();
   },
 };
@@ -368,9 +386,9 @@ const WhereIntent = {
         .speak(execWhere(slotValues.garbage.id,
           (slotValues.article && slotValues.article.synonym) || '',
           slotValues.garbage.synonym, OUT_SPEAKER))
-        .withSimpleCard(CARD_TITLE, execWhere(slotValues.garbage.id,
+        /* .withSimpleCard(CARD_TITLE, execWhere(slotValues.garbage.id,
           (slotValues.article && slotValues.article.synonym) || '',
-          slotValues.garbage.synonym, OUT_CARD));
+          slotValues.garbage.synonym, OUT_CARD)) */;
     } else {
       responseBuilder
         .speak('Ripeti il nome del rifiuto per favore.')
@@ -400,7 +418,7 @@ const WhenIntent = {
     if (slotValues.material && slotValues.material.id) {
       responseBuilder
         .speak(execWhen(slotValues.material.id, OUT_SPEAKER))
-        .withSimpleCard(CARD_TITLE, execWhen(slotValues.material.id, OUT_CARD));
+        /* .withSimpleCard(CARD_TITLE, execWhen(slotValues.material.id, OUT_CARD)) */;
     } else {
       responseBuilder
         .speak('Ripeti la tipologia dei rifiuti per favore.')
@@ -446,7 +464,7 @@ const WhatIntent = {
       (slotValues.dayOfWeek && slotValues.dayOfWeek.resolved);
     if (date && (date = parseDateString(date))) {
       responseBuilder.speak(execWhat(date, OUT_SPEAKER))
-        .withSimpleCard(CARD_TITLE, execWhat(date, OUT_CARD));
+        /* .withSimpleCard(CARD_TITLE, execWhat(date, OUT_CARD)) */;
     } else {
       responseBuilder.speak('Ripeti la data per favore.')
         .addElicitSlotDirective('date');
@@ -476,7 +494,7 @@ const InfoIntent = {
     if (slotValues.material && slotValues.material.id) {
       responseBuilder
         .speak(execInfo(slotValues.material.id, OUT_SPEAKER))
-        .withSimpleCard(CARD_TITLE, execInfo(slotValues.material.id, OUT_CARD));
+        /* .withSimpleCard(CARD_TITLE, execInfo(slotValues.material.id, OUT_CARD)) */;
     } else {
       responseBuilder
         .speak('Ripeti la tipologia dei rifiuti per favore.')
@@ -493,14 +511,14 @@ const HelpIntentHandler = {
       && handlerInput.requestEnvelope.request.intent.name === 'AMAZON.HelpIntent';
   },
   handle(handlerInput) {
-    const speechText = `Ecco cosa mi puoi chiedere:
+    const speechText = `Ad esempio mi puoi chiedere:
       <s>dove si buttano le lattine?</s>
       oppure
       <s>quando ritirano la plastica?</s>
       o ancora
-      <s>cosa ritirano domani?</s>
+      <s>cosa ritirano domani? (puoi anche indicare una data precisa, ad esempio 24 dicembre)</s>
       e infine
-      <s>cosa butto nella plastica?</s>`;
+      <s>cosa butto nell'umido?</s>`;
 
     return handlerInput.responseBuilder
       .speak(speechText)
@@ -545,7 +563,6 @@ const ErrorHandler = {
     return handlerInput.responseBuilder
       .speak('Scusa, non ho capito.')
       .reprompt('Scusa, non ho capito.')
-      // .withSimpleCard('ERROR', error.message)
       .getResponse();
   },
 };

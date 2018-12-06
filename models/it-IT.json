@@ -57,6 +57,9 @@
                     ],
                     "samples": [
                         "quando ritirano {article} {material}",
+                        "quando si butta {article} {material}",
+                        "quando si deve buttare {article} {material}",
+                        "quando devo buttare {article} {material}",
                         "quando si ritira {article} {material}",
                         "quando viene ritirato {article} {material}",
                         "quando viene ritirata {article} {material}",
@@ -113,7 +116,8 @@
                         "cosa si mette dentro {article} {material}",
                         "cosa metto {preposition} {material}",
                         "cosa metto dentro {article} {material}",
-                        "informazioni {preposition} {material}"
+                        "informazioni {preposition} {material}",
+                        "chiedi informazioni {preposition} {material}"
                     ]
                 }
             ],

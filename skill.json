@@ -5,12 +5,12 @@
         "it-IT": {
           "summary": "Skill per la raccolta differenziata della città di Lodi Vecchio",
           "examplePhrases": [
-            "Alexa chiedi a raccolta differenziata dove buttare il tetrapak",
-            "Alexa chiedi a raccolta differenziata quando ritirano la plastica",
-            "Alexa chiedi a raccolta differenziata cosa ritirano domani"
+            "Alexa, chiedi a raccolta differenziata dove buttare il tetrapak",
+            "Alexa, chiedi a raccolta differenziata quando ritirano la plastica",
+            "Alexa, chiedi a raccolta differenziata cosa ritirano domani"
           ],
           "name": "Raccolta differenziata Lodi Vecchio",
-          "description": "Abiti a Lodi Vecchio? Non sai dove buttare i rifiuti? Questa skill fa per te.\n\nEcco cosa mi puoi chiedere:\n* dove si buttano le lattine?\n* quando ritirano la plastica?\n* cosa ritirano domani?\n* cosa ritirano venerdì?\n* cosa si butta nell'umido?\n\nAttenzione: questa skill non sostituisce le indicazioni rilasciate dal Comune di Lodi Vecchio riguardo alla raccolta differenziata dei rifiuti.",
+          "description": "Abiti a Lodi Vecchio? Non sai dove o quando buttare i rifiuti? Questa skill fa per te.\n\nEcco cosa puoi chiedere:\n* dove si buttano le lattine?\n* quando ritirano la plastica?\n* cosa ritirano domani?\n* cosa ritirano venerdì?\n* cosa si butta nell'umido?\n\nAttenzione: questa skill non sostituisce le indicazioni rilasciate dal Comune di Lodi Vecchio riguardo alla raccolta differenziata dei rifiuti.",
           "keywords": [
             "raccolta differenziata",
             "spazzatura",
@@ -21,8 +21,8 @@
         }
       },
       "isAvailableWorldwide": false,
-      "testingInstructions": "Sample Testing Instructions.",
-      "category": "KNOWLEDGE_AND_TRIVIA",
+      "testingInstructions": "Nessuna",
+      "category": "EDUCATION_AND_REFERENCE",
       "distributionCountries": [
         "IT"
       ]
@@ -43,6 +43,13 @@
         }
       }
     },
-    "manifestVersion": "1.0"
+    "manifestVersion": "1.0",
+    "privacyAndCompliance": {
+      "allowsPurchases": false,
+      "isExportCompliant": true,
+      "containsAds": false,
+      "isChildDirected": false,
+      "usesPersonalInfo": false
+    }
   }
 }

@@ -1,17 +1,17 @@
 {
   "name": "skill-raccolta-differenziata-lodi-vecchio",
   "version": "1.0.0",
-  "description": "",
+  "description": "Skill Alexa per la raccolta differenziata di Lodi Vecchio",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "mocha ../../test/test.js --reporter list",
+    "test:md": "mocha ../../test/test.js --reporter markdown > ../../test/README.md"
   },
   "author": "narsenico",
   "license": "ISC",
   "dependencies": {
     "ask-sdk-core": "^2.0.0",
     "ask-sdk-model": "^1.0.0",
-    "dayjs": "^1.7.7",
     "moment": "^2.22.2",
     "moment-timezone": "^0.5.23"
   }

@@ -6,11 +6,11 @@
       "merge": {},
       "resources": {
         "manifest": {
-          "eTag": "e4fe68cddabeb2f8606b668115b847ae"
+          "eTag": "6ec0f57aec223d65fb72dc7caef66164"
         },
         "interactionModel": {
           "it-IT": {
-            "eTag": "ce1cf7ee2f79f9c48aee4e032abdeb54"
+            "eTag": "a7bbde67ca16a6b3cba2d34aad7e46d8"
           }
         },
         "lambda": [
@@ -23,7 +23,7 @@
             "codeUri": "lambda/custom",
             "functionName": "ask-custom-skill-raccolta-differenziata-lodi-vecchio-default",
             "handler": "index.handler",
-            "revisionId": "079819db-a44c-4eaf-8cbb-99149b63fd06",
+            "revisionId": "8f17b664-8a64-4f9e-8134-7989eb042799",
             "runtime": "nodejs8.10"
           },
           {
@@ -35,7 +35,7 @@
             "codeUri": "lambda/custom",
             "functionName": "ask-custom-skill-raccolta-differenziata-lodi-vecchio-default",
             "handler": "index.handler",
-            "revisionId": "40ec0789-67bd-4fe4-82cf-d7a4239aedf7",
+            "revisionId": "ba65dce8-a3bf-4442-a6e0-bae373a162a2",
             "runtime": "nodejs8.10"
           }
         ]

@@ -5,6 +5,8 @@ Skill per Alexa
 
 ## Funzionalità della skill
 
+Frase di attivazione: `raccolta differenziata`
+
 ### Dove
 - dove butto la biro?
 - dove si buttano le lattine?
@@ -30,3 +32,7 @@ Skill per Alexa
 - Secco
 - Umido
 - Vetro
+
+---
+
+[Test report](https://github.com/narsenico/skill-raccolta-differenziata-lodi-vecchio/blob/master/test/README.md)
