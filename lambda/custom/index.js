@@ -14,14 +14,15 @@ const moment = require('moment-timezone');
 const { createSessionHelper,
   getSlotValues,
   humanJoin,
-  log } = require('./utility.js');
+  log,
+  OUT_SPEAKER,
+  OUT_CARD,
+  COMPOSER } = require('./utility.js');
 
 const CARD_TITLE = 'Raccolta differenziata Lodi Vecchio',
   DAY_OF_WEEK = ['domenica', 'lunedì', 'martedì', 'mercoledì', 'giovedì', 'venerdì', 'sabato'],
   DATE_FORMAT = 'YYYY-MM-DD',
   DATE_LONG_FORMAT = 'dddd, D MMMM',
-  OUT_SPEAKER = 'speaker',
-  OUT_CARD = 'card',
   MATERIALS = require('./materials.json'),
   CALENDAR = require('./calendar.json'),
   RCALENDAR = reveserCalendar(),
@@ -33,45 +34,6 @@ const CARD_TITLE = 'Raccolta differenziata Lodi Vecchio',
   //  https://developer.amazon.com/docs/smapi/alexa-settings-api-reference.html#request
   //  access token e device id sono in handlerInput.requestEnvelope
   TIMEZONE = 'Europe/Rome';
-
-const COMPOSER = {
-  [OUT_SPEAKER]: {
-    phrase(...strings) {
-      return strings.reduce((m, p) => {
-        return m += `<s>${p}</s>`
-      }, '');
-    },
-    list(string) {
-      return `<s>${string}</s>`;
-    },
-    break(ms) {
-      return `<break time="${ms}ms"/>`;
-    },
-    emphasis(string, level = 'moderate') {
-      return `<emphasis level="${level}">${string}</emphasis>`;
-    },
-    prosody(string, { rate = '100%', pitch = '+0%', volume = '+0dB' }) {
-      return `<prosody rate="${rate}" pitch="${pitch}" volume="${volume}">${string}</prosody>`;
-    }
-  },
-  [OUT_CARD]: {
-    phrase(string) {
-      return `${string}\n`;
-    },
-    list(string) {
-      return `* ${string}\n`;
-    },
-    break() {
-      return '\n';
-    },
-    emphasis(string, level) {
-      return `"${string}"`;
-    },
-    prosody(string, { rate, pitch, volume }) {
-      return string;
-    }
-  }
-}
 
 /**
  * 

@@ -44,160 +44,157 @@ alexaTest.initialize(
 
 alexaTest.setLocale('it-IT');
 
+function createRequest(intentName, slots) {
+    if (slots && !Array.isArray(slots)) {
+        slots = [slots];
+    }
+    if (slots && slots.length > 0) {
+        const request = alexaTest.getIntentRequest(intentName, slots.reduce((m, slot) => {
+            m[slot.name] = slot.synonim;
+            return m;
+        }, {}));
+        return slots.reduce((request, slot) => {
+            return requestWithEntityResolution = alexaTest.addEntityResolutionToRequest(
+                request,
+                slot.name,
+                slot.type,
+                slot.value,
+                slot.id
+            );
+        }, request);
+    } else {
+        return alexaTest.getIntentRequest(intentName);
+    }
+}
+
+function test(intentName, slots, repromptsNothing, shouldEndSession, cb) {
+    alexaTest.test([
+        {
+            request: intentName ?
+                createRequest(intentName, slots) :
+                alexaTest.getLaunchRequest(),
+            repromptsNothing,
+            shouldEndSession,
+            saysCallback: cb
+        }
+    ]);
+}
+
 describe('raccolta differenziata', function () {
 
     if (TEST_LAUNCH) {
-        describe('LaunchRequest', function () {
-            alexaTest.test([
-                {
-                    request: alexaTest.getLaunchRequest(),
-                    repromptsNothing: false,
-                    shouldEndSession: false,
-                    saysCallback(context, speech) {
-                        // console.log(speech);
-                        expect(context.framework.locale).is.eq('it-IT');
-                        expect(speech).contains('Benvenuto in raccolta differenziata Lodi Vecchio');
-                    }
-                }
-            ]);
+        test(null, null, false, false, (context, speech) => {
+            expect(context.framework.locale).is.eq('it-IT');
+            expect(speech).contains('Benvenuto in raccolta differenziata Lodi Vecchio');
         });
     }
 
     if (TEST_WHERE) {
         describe('WhereIntent', function () {
-            const WHERE_TEST_COUNT = 10;
+            describe('Non trovato', function () {
+                test('WhereIntent', {
+                    name: 'garbage',
+                    type: 'TYPE_GARBAGE',
+                    value: 'xxxx',
+                    synonim: null,
+                    id: null
+                }, true, true, (context, speech) =>
+                        expect(speech).contains('Ripeti il nome del rifiuto per favore')
+                );
+            });
 
-            for (let ii = 0; ii < WHERE_TEST_COUNT; ii++) {
+            describe('Il fiammifero', function () {
+                test('WhereIntent', [{
+                    name: 'garbage',
+                    type: 'TYPE_GARBAGE',
+                    value: 'SECC',
+                    synonim: 'fiammifero',
+                    id: 'SECC'
+                }, {
+                    name: 'article',
+                    type: 'TYPE_ARTICLE',
+                    value: 'il',
+                    synonim: 'il',
+                    id: null
+                }], true, true, (context, speech) =>
+                        expect(speech).contains('il fiammifero va')
+                );
+            });
+
+            describe('Random garbage', function () {
                 const tg = TYPE_GARBAGE.values.random();
                 const synonim = tg.name.synonyms.random();
                 const dest = MATERIALS[tg.id].where;
-
-                describe(`${synonim} -> ${dest}`, function () {
-                    const slotWithSynonym = { 'garbage': synonim };
-                    const requestWithEntityResolution = alexaTest.addEntityResolutionToRequest(
-                        alexaTest.getIntentRequest('WhereIntent', slotWithSynonym),
-                        'garbage',
-                        'TYPE_GARBAGE',
-                        tg.name.value,
-                        tg.id
-                    );
-
-                    alexaTest.test([
-                        {
-                            request: requestWithEntityResolution,
-                            repromptsNothing: true,
-                            shouldEndSession: true,
-                            saysCallback(context, speech) {
-                                expect(speech).contains(dest);
-                            }
-                        }
-                    ]);
-                });
-            }
+                test('WhereIntent', {
+                    name: 'garbage',
+                    type: 'TYPE_GARBAGE',
+                    value: tg.name.value,
+                    synonim: synonim,
+                    id: tg.id
+                }, true, true, (context, speech) =>
+                        expect(speech).contains(dest)
+                );
+            });
         });
     }
+
 
     if (TEST_WHAT) {
         describe('WhatIntent', function () {
             describe('Oggi', function () {
                 const stoday = moment().format(DATE_FORMAT);
-                const slotWithSynonym = { 'date': stoday };
-                const requestWithEntityResolution = alexaTest.addEntityResolutionToRequest(
-                    alexaTest.getIntentRequest('WhatIntent', slotWithSynonym),
-                    'date',
-                    'AMAZON.DATE',
-                    stoday,
-                    null
+                test('WhatIntent', {
+                    name: 'date',
+                    type: 'AMAZON.DATE',
+                    value: stoday,
+                    synonim: stoday,
+                    id: null
+                }, true, true, (context, speech) =>
+                        expect(speech).to.match(/(Per\s)?oggi/i)
                 );
-
-                alexaTest.test([
-                    {
-                        request: requestWithEntityResolution,
-                        repromptsNothing: true,
-                        shouldEndSession: true,
-                        saysCallback(context, speech) {
-                            expect(speech).to.match(/(Per\s)?oggi/i);
-                        }
-                    }
-                ]);
             });
 
             describe('Domani', function () {
                 const stomorrow = moment().add(1, 'days').format(DATE_FORMAT);
-                const slotWithSynonym = { 'date': stomorrow };
-                const requestWithEntityResolution = alexaTest.addEntityResolutionToRequest(
-                    alexaTest.getIntentRequest('WhatIntent', slotWithSynonym),
-                    'date',
-                    'AMAZON.DATE',
-                    stomorrow,
-                    null
+                test('WhatIntent', {
+                    name: 'date',
+                    type: 'AMAZON.DATE',
+                    value: stomorrow,
+                    synonim: stomorrow,
+                    id: null
+                }, true, true, (context, speech) =>
+                        expect(speech).to.match(/(Per\s)?domani/i)
                 );
-
-                alexaTest.test([
-                    {
-                        request: requestWithEntityResolution,
-                        repromptsNothing: true,
-                        shouldEndSession: true,
-                        saysCallback(context, speech) {
-                            expect(speech).to.match(/(Per\s)?domani/i);
-                        }
-                    }
-                ]);
             });
 
-            const WHAT_TEST_COUNT = 10;
-
-            for (let ii = 0; ii < WHAT_TEST_COUNT; ii++) {
+            describe('Random date', function () {
                 const date = moment().add(2 + Math.random() * 10, 'days');
                 const sdate = date.format(DATE_FORMAT);
-                describe(sdate, function () {
-                    const slotWithSynonym = { 'date': sdate };
-                    const requestWithEntityResolution = alexaTest.addEntityResolutionToRequest(
-                        alexaTest.getIntentRequest('WhatIntent', slotWithSynonym),
-                        'date',
-                        'AMAZON.DATE',
-                        sdate,
-                        null
-                    );
-
-                    alexaTest.test([
-                        {
-                            request: requestWithEntityResolution,
-                            repromptsNothing: true,
-                            shouldEndSession: true,
-                            saysCallback(context, speech) {
-                                expect(speech).contains(date.locale('it').format(DATE_LONG_FORMAT));
-                            }
-                        }
-                    ]);
-                });
-            }
+                test('WhatIntent', {
+                    name: 'date',
+                    type: 'AMAZON.DATE',
+                    value: sdate,
+                    synonim: sdate,
+                    id: null
+                }, true, true, (context, speech) =>
+                        expect(speech).contains(date.locale('it').format(DATE_LONG_FORMAT))
+                );
+            });
         });
     }
 
     if (TEST_WHEN) {
         describe('WhenIntent', function () {
-            describe('Oggi', function () {
-                const slotWithSynonym = { 'material': 'pile' };
-                const requestWithEntityResolution = alexaTest.addEntityResolutionToRequest(
-                    alexaTest.getIntentRequest('WhenIntent', slotWithSynonym),
-                    'material',
-                    'TYPE_MATERIAL',
-                    'pile',
-                    'PILE'
+            describe('Pile', function () {
+                test('WhenIntent', {
+                    name: 'material',
+                    type: 'TYPE_MATERIAL',
+                    value: 'pile',
+                    synonim: 'pile',
+                    id: 'PILE'
+                }, true, true, (context, speech) =>
+                        expect(speech).to.match(/Non\sè\sprevisto\salcun\sritiro.*Le\spile\ssono\sda\sbuttare/i)
                 );
-
-                alexaTest.test([
-                    {
-                        request: requestWithEntityResolution,
-                        repromptsNothing: true,
-                        shouldEndSession: true,
-                        saysCallback(context, speech) {
-                            // console.log(speech)
-                            expect(speech).contains('Le pile sono da buttare');
-                        }
-                    }
-                ]);
             });
         });
     }
@@ -205,26 +202,15 @@ describe('raccolta differenziata', function () {
     if (TEST_INFO) {
         describe('InfoIntent', function () {
             describe('Pile', function () {
-                const slotWithSynonym = { 'material': 'pile' };
-                const requestWithEntityResolution = alexaTest.addEntityResolutionToRequest(
-                    alexaTest.getIntentRequest('InfoIntent', slotWithSynonym),
-                    'material',
-                    'TYPE_MATERIAL',
-                    'pile',
-                    'PILE'
+                test('InfoIntent', {
+                    name: 'material',
+                    type: 'TYPE_MATERIAL',
+                    value: 'pile',
+                    synonim: 'pile',
+                    id: 'PILE'
+                }, true, true, (context, speech) =>
+                        expect(speech).contains('Le pile sono da buttare')
                 );
-
-                alexaTest.test([
-                    {
-                        request: requestWithEntityResolution,
-                        repromptsNothing: true,
-                        shouldEndSession: true,
-                        saysCallback(context, speech) {
-                            // console.log(speech)
-                            expect(speech).contains('Le pile sono da buttare');
-                        }
-                    }
-                ]);
             });
         });
     }

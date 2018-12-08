@@ -23,7 +23,7 @@
             "codeUri": "lambda/custom",
             "functionName": "ask-custom-skill-raccolta-differenziata-lodi-vecchio-default",
             "handler": "index.handler",
-            "revisionId": "640f4f12-b2ed-4258-80be-c35c455d0649",
+            "revisionId": "d4a121a1-9599-41c0-87f1-ce1de75308c6",
             "runtime": "nodejs8.10"
           },
           {
@@ -35,7 +35,7 @@
             "codeUri": "lambda/custom",
             "functionName": "ask-custom-skill-raccolta-differenziata-lodi-vecchio-default",
             "handler": "index.handler",
-            "revisionId": "b6d0a8a6-02cd-4882-bf2d-484ef3334e6f",
+            "revisionId": "0d1bcd10-983e-491e-99e5-a06f21ea8ff8",
             "runtime": "nodejs8.10"
           }
         ]

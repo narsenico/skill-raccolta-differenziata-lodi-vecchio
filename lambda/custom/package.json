@@ -5,13 +5,13 @@
   "main": "index.js",
   "scripts": {
     "test": "mocha ../../test/test.js --reporter list --test-all",
-    "test:launch": "mocha ../../test/test.js --reporter list --test-launch",
-    "test:info": "mocha ../../test/test.js --reporter list --test-info",
-    "test:when": "mocha ../../test/test.js --reporter list --test-when",
-    "test:what": "mocha ../../test/test.js --reporter list --test-what",
-    "test:where": "mocha ../../test/test.js --reporter list --test-where",
-    "test:debug": "mocha ../../test/test.js --reporter list --test-debug",
-    "test:md": "mocha ../../test/test.js --reporter markdown > ../../test/README.md"
+    "test:launch": "mocha ../../test/test.js --reporter list --test-launch --test-debug",
+    "test:info": "mocha ../../test/test.js --reporter list --test-info --test-debug",
+    "test:when": "mocha ../../test/test.js --reporter list --test-when --test-debug",
+    "test:what": "mocha ../../test/test.js --reporter list --test-what --test-debug",
+    "test:where": "mocha ../../test/test.js --reporter list --test-where --test-debug",
+    "test:debug": "mocha ../../test/test.js --reporter list --test-all --test-debug",
+    "test:md": "mocha ../../test/test.js --reporter markdown --test-all > ../../test/README.md"
   },
   "author": "narsenico",
   "license": "ISC",
