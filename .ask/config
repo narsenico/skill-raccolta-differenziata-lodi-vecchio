@@ -10,7 +10,7 @@
         },
         "interactionModel": {
           "it-IT": {
-            "eTag": "a7bbde67ca16a6b3cba2d34aad7e46d8"
+            "eTag": "af379ca1488ead5477546f797571da0e"
           }
         },
         "lambda": [
@@ -23,7 +23,7 @@
             "codeUri": "lambda/custom",
             "functionName": "ask-custom-skill-raccolta-differenziata-lodi-vecchio-default",
             "handler": "index.handler",
-            "revisionId": "8f17b664-8a64-4f9e-8134-7989eb042799",
+            "revisionId": "640f4f12-b2ed-4258-80be-c35c455d0649",
             "runtime": "nodejs8.10"
           },
           {
@@ -35,7 +35,7 @@
             "codeUri": "lambda/custom",
             "functionName": "ask-custom-skill-raccolta-differenziata-lodi-vecchio-default",
             "handler": "index.handler",
-            "revisionId": "ba65dce8-a3bf-4442-a6e0-bae373a162a2",
+            "revisionId": "b6d0a8a6-02cd-4882-bf2d-484ef3334e6f",
             "runtime": "nodejs8.10"
           }
         ]

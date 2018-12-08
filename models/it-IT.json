@@ -9,7 +9,10 @@
                 },
                 {
                     "name": "AMAZON.HelpIntent",
-                    "samples": []
+                    "samples": [
+                        "aiuto",
+                        "aiutami"
+                    ]
                 },
                 {
                     "name": "AMAZON.StopIntent",
@@ -236,7 +239,8 @@
                             "name": {
                                 "value": "farmaci",
                                 "synonyms": [
-                                    "farmaco"
+                                    "farmaco",
+                                    "medicinali"
                                 ]
                             }
                         }
@@ -507,6 +511,8 @@
                                     "biro",
                                     "blister medicine",
                                     "bottoni di plastica",
+                                    "bustina camomilla",
+                                    "bustina del thè",
                                     "calze di nylon",
                                     "calze",
                                     "candele",
@@ -537,6 +543,8 @@
                                     "etichette",
                                     "evidenziatore",
                                     "fazzoletti di carta usati",
+                                    "fazzolettini di carta usati",
+                                    "fiammifero",
                                     "fiammiferi",
                                     "fiori finti",
                                     "fotografie",
@@ -607,8 +615,6 @@
                                     "brioches",
                                     "bucce di frutta",
                                     "bucce di verdura",
-                                    "bustina di camomilla",
-                                    "bustina di thè",
                                     "caffè",
                                     "carne",
                                     "cenere del camino",
@@ -656,6 +662,7 @@
                                     "confezioni di vetro",
                                     "imballaggi di vetro",
                                     "lampadina",
+                                    "lampadine",
                                     "vasetti di vetro",
                                     "vaso di vetro",
                                     "vetro"

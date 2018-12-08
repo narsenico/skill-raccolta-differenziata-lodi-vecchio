@@ -11,6 +11,10 @@
 
 const Alexa = require('ask-sdk-core');
 const moment = require('moment-timezone');
+const { createSessionHelper,
+  getSlotValues,
+  humanJoin,
+  log } = require('./utility.js');
 
 const CARD_TITLE = 'Raccolta differenziata Lodi Vecchio',
   DAY_OF_WEEK = ['domenica', 'lunedì', 'martedì', 'mercoledì', 'giovedì', 'venerdì', 'sabato'],
@@ -21,7 +25,14 @@ const CARD_TITLE = 'Raccolta differenziata Lodi Vecchio',
   MATERIALS = require('./materials.json'),
   CALENDAR = require('./calendar.json'),
   RCALENDAR = reveserCalendar(),
-  rgPlural = /^(i|gli|le)$/i;
+  rgPlural = /^(i|gli|le)$/i,
+  // ora in cui viene ritirata la spazzatura
+  TRASH_COLLECTION_HOUR = 6,
+  // fuso orario italia
+  // TODO: recuperare la timezone 
+  //  https://developer.amazon.com/docs/smapi/alexa-settings-api-reference.html#request
+  //  access token e device id sono in handlerInput.requestEnvelope
+  TIMEZONE = 'Europe/Rome';
 
 const COMPOSER = {
   [OUT_SPEAKER]: {
@@ -29,7 +40,6 @@ const COMPOSER = {
       return strings.reduce((m, p) => {
         return m += `<s>${p}</s>`
       }, '');
-      // return `<s>${string}</s>`;
     },
     list(string) {
       return `<s>${string}</s>`;
@@ -61,57 +71,6 @@ const COMPOSER = {
       return string;
     }
   }
-}
-
-/**
- * 
- * @param {Object} filledSlots così come restituito da intent.slots
- * @returns ritorna un oggetto le cui proprietà sono i nomi degli slot, 
- *  e valorizzate con {id, resolved, synonym, isValidated}
- */
-function getSlotValues(filledSlots) {
-  const slotValues = {};
-
-  log(`The filled slots: ${JSON.stringify(filledSlots)}`);
-  Object.keys(filledSlots).forEach((item) => {
-    const name = filledSlots[item].name;
-
-    if (filledSlots[item] &&
-      filledSlots[item].resolutions &&
-      filledSlots[item].resolutions.resolutionsPerAuthority[0] &&
-      filledSlots[item].resolutions.resolutionsPerAuthority[0].status &&
-      filledSlots[item].resolutions.resolutionsPerAuthority[0].status.code) {
-      switch (filledSlots[item].resolutions.resolutionsPerAuthority[0].status.code) {
-        case 'ER_SUCCESS_MATCH':
-          slotValues[name] = {
-            synonym: filledSlots[item].value,
-            resolved: filledSlots[item].resolutions.resolutionsPerAuthority[0].values[0].value.name,
-            id: filledSlots[item].resolutions.resolutionsPerAuthority[0].values[0].value.id,
-            isValidated: true,
-          };
-          break;
-        case 'ER_SUCCESS_NO_MATCH':
-          slotValues[name] = {
-            synonym: filledSlots[item].value,
-            resolved: filledSlots[item].value,
-            id: null,
-            isValidated: false,
-          };
-          break;
-        default:
-          break;
-      }
-    } else {
-      slotValues[name] = {
-        synonym: filledSlots[item].value,
-        resolved: filledSlots[item].value,
-        id: null,
-        isValidated: false,
-      };
-    }
-  }, this);
-  log(`Slot values: ${JSON.stringify(slotValues)}`);
-  return slotValues;
 }
 
 /**
@@ -150,21 +109,18 @@ function execWhen(idMaterial, outDest) {
   const dates = CALENDAR[idMaterial];
   if (dates && dates.length > 0) {
     // cerco una data di ritiro maggiore o uguale a oggi/domani (in base all'ora)
-    // TODO: recuperare la timezone 
-    //  https://developer.amazon.com/docs/smapi/alexa-settings-api-reference.html#request
-    //  access token e device id sono in handlerInput.requestEnvelope
-    const refdate = today.tz('Europe/Rome').hour() > 6 ? stomorrow : stoday;
+    const refdate = today.tz(TIMEZONE).hour() > TRASH_COLLECTION_HOUR ? stomorrow : stoday;
     const found = dates.find(d => d >= refdate);
-    log('WHEN hh', today.tz('Europe/Rome').hour(),
+    log('WHEN hh', today.tz(TIMEZONE).hour(),
       'ref', refdate,
       'found', found);
     if (found) {
       if (found === stoday) {
-        return C.phrase(`Il ritiro ${material.when} è previsto per oggi, entro le ore sei del mattino`);
+        return C.phrase(`Il prossimo ritiro ${material.when} è previsto per oggi, entro le ore sei del mattino`);
       } else if (found === stomorrow) {
-        return C.phrase(`Il ritiro ${material.when} è previsto per domani`);
+        return C.phrase(`Il prossimo ritiro ${material.when} è previsto per domani`);
       } else {
-        return C.phrase(`Il ritiro ${material.when} è previsto per
+        return C.phrase(`Il prossimo ritiro ${material.when} è previsto per
           ${moment(found).locale('it').format(DATE_LONG_FORMAT)}`);
       }
     } else {
@@ -190,27 +146,32 @@ function execWhen(idMaterial, outDest) {
  */
 function execWhat(dates, outDest) {
   const C = COMPOSER[outDest];
-  const stoday = moment().format(DATE_FORMAT);
+  const today = moment();
+  const stoday = today.format(DATE_FORMAT);
   const stomorrow = moment().add(1, 'days').format(DATE_FORMAT);
   let materialsPerDate;
   let output = '';
+  let sayRemember = Math.random() >= .5;
   for (let ii = 0; ii < dates.length; ii++) {
     materialsPerDate = RCALENDAR[dates[ii]];
     log('WHAT', dates[ii], materialsPerDate);
     if (materialsPerDate) {
       if (dates[ii] === stoday) {
-        output += C.list(`Oggi ritirano ${humanJoin(materialsPerDate.map(m => MATERIALS[m].what))}`);
+        if (today.tz(TIMEZONE).hour() > TRASH_COLLECTION_HOUR) {
+          sayRemember = true;
+        }
+        output += C.list(`Oggi ritirano ${humanJoin(materialsPerDate.map(m => MATERIALS[m].what), 'e')}`);
       } else if (dates[ii] === stomorrow) {
         output += C.list(`Domani, ${moment(dates[ii]).locale('it').format(DATE_LONG_FORMAT)},
-          ritirano ${humanJoin(materialsPerDate.map(m => MATERIALS[m].what))}`);
+          ritirano ${humanJoin(materialsPerDate.map(m => MATERIALS[m].what), 'e')}`);
       } else {
         output += C.list(`${moment(dates[ii]).locale('it').format(DATE_LONG_FORMAT)},
-          ritirano ${humanJoin(materialsPerDate.map(m => MATERIALS[m].what))}`);
+          ritirano ${humanJoin(materialsPerDate.map(m => MATERIALS[m].what), 'e')}`);
       }
     }
   }
   if (output) {
-    if (Math.random() >= .5) {
+    if (sayRemember) {
       output + C.phrase('Ricordati che devi esporre i rifiuti entro le ore sei');
     }
   } else {
@@ -305,15 +266,10 @@ function parseDateString(sdate) {
  * @returns mdate (aggiornata)
  */
 function nextDay(dayOfWeek) {
-  // sono a domenica 0 e voglio martedì 0 + 2
-  // sono a lunedì 1 e voglio martedì 2 - 1
-  // sono a sabato 6 e voglio martedì 7 - 6 + 2
-  // sono a venerdì 5 e voglio martedì 7 - 5 + 2
-
   const today = moment();
   const curDayOfWeek = today.day();
   if (curDayOfWeek === dayOfWeek) {
-    if (today.tz('Europe/Rome').hour() > 6) {
+    if (today.tz(TIMEZONE).hour() > TRASH_COLLECTION_HOUR) {
       return today.add(7, 'days');
     } else {
       return today;
@@ -322,16 +278,6 @@ function nextDay(dayOfWeek) {
     return today.add(dayOfWeek - curDayOfWeek, 'days');
   } else {
     return today.add(7 - curDayOfWeek + dayOfWeek, 'days');
-  }
-}
-
-function humanJoin(phrases) {
-  if (phrases.length === 1) {
-    return phrases[0];
-  } else {
-    const tokens = [...phrases];
-    const last = tokens.splice(-1);
-    return tokens.join(', ') + ' e ' + last;
   }
 }
 
@@ -344,18 +290,11 @@ function reveserCalendar() {
   }, {});
 }
 
-function log() {
-  if (!process.env.NO_DEBUG) {
-    console.log.apply(null, arguments);
-  }
-}
-
 const LaunchRequestHandler = {
   canHandle(handlerInput) {
     return handlerInput.requestEnvelope.request.type === 'LaunchRequest';
   },
   handle(handlerInput) {
-    log('NO_DEBUG', process.env.NO_DEBUG);
     const C = COMPOSER[OUT_SPEAKER];
     return handlerInput.responseBuilder
       .speak(C.phrase(`Benvenuto in raccolta differenziata Lodi Vecchio,
@@ -384,12 +323,13 @@ const WhereIntent = {
     if (slotValues.garbage && slotValues.garbage.id) {
       responseBuilder
         .speak(execWhere(slotValues.garbage.id,
-          (slotValues.article && slotValues.article.synonym) || '',
+          (slotValues.article && slotValues.article.isValidated && slotValues.article.synonym) || '',
           slotValues.garbage.synonym, OUT_SPEAKER))
         /* .withSimpleCard(CARD_TITLE, execWhere(slotValues.garbage.id,
-          (slotValues.article && slotValues.article.synonym) || '',
+          (slotValues.article && slotValues.article.isValidated && slotValues.article.synonym) || '',
           slotValues.garbage.synonym, OUT_CARD)) */;
     } else {
+      log('WHERE repeat');
       responseBuilder
         .speak('Ripeti il nome del rifiuto per favore.')
         .addElicitSlotDirective('garbage');
@@ -420,6 +360,7 @@ const WhenIntent = {
         .speak(execWhen(slotValues.material.id, OUT_SPEAKER))
         /* .withSimpleCard(CARD_TITLE, execWhen(slotValues.material.id, OUT_CARD)) */;
     } else {
+      log('WHEN repeat');
       responseBuilder
         .speak('Ripeti la tipologia dei rifiuti per favore.')
         .addElicitSlotDirective('material');
@@ -466,6 +407,7 @@ const WhatIntent = {
       responseBuilder.speak(execWhat(date, OUT_SPEAKER))
         /* .withSimpleCard(CARD_TITLE, execWhat(date, OUT_CARD)) */;
     } else {
+      log('WHAT repeat');
       responseBuilder.speak('Ripeti la data per favore.')
         .addElicitSlotDirective('date');
     }
@@ -488,6 +430,7 @@ const InfoIntent = {
       && handlerInput.requestEnvelope.request.intent.name === 'InfoIntent';
   },
   handle(handlerInput) {
+    const attr = createSessionHelper(handlerInput);
     const responseBuilder = handlerInput.responseBuilder;
     const filledSlots = handlerInput.requestEnvelope.request.intent.slots;
     const slotValues = getSlotValues(filledSlots);
@@ -496,9 +439,18 @@ const InfoIntent = {
         .speak(execInfo(slotValues.material.id, OUT_SPEAKER))
         /* .withSimpleCard(CARD_TITLE, execInfo(slotValues.material.id, OUT_CARD)) */;
     } else {
-      responseBuilder
-        .speak('Ripeti la tipologia dei rifiuti per favore.')
-        .addElicitSlotDirective('material');
+      log('INFO repeat');
+      if (!attr.get('count')) {
+        attr.set('count', 1);
+        responseBuilder
+          .speak('Ripeti la tipologia dei rifiuti, per favore.');
+      } else {
+        attr.set('count', 0);
+        responseBuilder
+          .speak(`Puoi chiedere informazioni su queste tipologie di rifiuti: 
+            umido, secco, plastica, carta, vetro, pile o farmaci.`);
+      }
+      responseBuilder.addElicitSlotDirective('material');
     }
     return responseBuilder
       .getResponse();
@@ -516,9 +468,9 @@ const HelpIntentHandler = {
       oppure
       <s>quando ritirano la plastica?</s>
       o ancora
-      <s>cosa ritirano domani? (puoi anche indicare una data precisa, ad esempio 24 dicembre)</s>
+      <s>cosa butto nell'umido?</s>
       e infine
-      <s>cosa butto nell'umido?</s>`;
+      <s>cosa ritirano domani? (ma puoi anche indicare una data precisa, ad esempio 24 dicembre)</s>`;
 
     return handlerInput.responseBuilder
       .speak(speechText)

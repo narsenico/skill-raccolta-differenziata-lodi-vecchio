@@ -28,7 +28,7 @@
             "I punti di raccolta sono:",
             "Via quattro Novembre (cortile del Centro Socio Sanitario)",
             "Via Libertà (vicino alla farmacia)",
-            "presso il Centro di Raccolta Comunale di Vìa Martin Luther King"
+            "oppure presso il Centro di Raccolta Comunale di Vìa Martin Luther King"
         ]
     },
     "LATT": {
@@ -65,7 +65,7 @@
             "Le pile sono da buttare negli appositi contenitori stradali.",
             "I punti di raccolta sono:",
             "Via quattro Novembre (presso il Centro Socio Sanitario)",
-            "Centro di raccolta di via Martin Luther King"
+            "oppure Centro di raccolta di via Martin Luther King"
         ]
     },
     "SECC": {
@@ -89,7 +89,7 @@
         "when": "dell'umido",
         "samples": [
             "Avanzi di pesce, ossa, resti di frutta e verdura.",
-            "Tovaglioli, fazzolettini, bustine di thè e simili.",
+            "Tovaglioli, fazzolettini, filtri di thè e simili.",
             "Resti di fondi di caffè, uova, formaggio.",
             "Segatura, ceneri fredde, fiori recisi, cibi scaduti privati della confezione, e tutto ciò che è organico."
         ],
