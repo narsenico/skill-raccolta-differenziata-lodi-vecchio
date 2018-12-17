@@ -87,6 +87,15 @@ describe('raccolta differenziata', function () {
             expect(context.framework.locale).is.eq('it-IT');
             expect(speech).contains('Benvenuto in raccolta differenziata Lodi Vecchio');
         });
+        test('AMAZON.HelpIntent', null, false, false, (context, speech) =>
+            expect(speech).contains('Ad esempio mi puoi chiedere')
+        );
+        test('AMAZON.CancelIntent', null, false, true, (context, speech) =>
+            expect(speech).contains('Arrivederci')
+        );
+        test('AMAZON.StopIntent', null, false, true, (context, speech) =>
+            expect(speech).contains('Arrivederci')
+        );
     }
 
     if (TEST_WHERE) {

@@ -436,6 +436,7 @@ const HelpIntentHandler = {
 
     return handlerInput.responseBuilder
       .speak(speechText)
+      .withShouldEndSession(false)
       .getResponse();
   },
 };
