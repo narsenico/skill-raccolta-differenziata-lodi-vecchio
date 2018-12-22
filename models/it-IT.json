@@ -31,6 +31,7 @@
                         }
                     ],
                     "samples": [
+                        "dove butto",
                         "dove butto {article} {garbage}",
                         "dove buttare {article} {garbage}",
                         "dove devo buttare {article} {garbage}",
@@ -59,6 +60,7 @@
                         }
                     ],
                     "samples": [
+                        "quando ritirano",
                         "quando ritirano {article} {material}",
                         "quando si butta {article} {material}",
                         "quando si deve buttare {article} {material}",
@@ -83,6 +85,7 @@
                         }
                     ],
                     "samples": [
+                        "cosa ritirano",
                         "cosa ritirano il prossimo {dayOfWeek}",
                         "cosa ritirano la prossima {dayOfWeek}",
                         "cosa ritirano il {date}",
@@ -111,6 +114,7 @@
                         }
                     ],
                     "samples": [
+                        "informazioni",
                         "cosa si butta {preposition} {material}",
                         "cosa si butta dentro {article} {material}",
                         "cosa butto {preposition} {material}",

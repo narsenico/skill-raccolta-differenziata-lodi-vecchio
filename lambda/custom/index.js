@@ -260,8 +260,9 @@ const LaunchRequestHandler = {
     const C = COMPOSER[OUT_SPEAKER];
     return handlerInput.responseBuilder
       .speak(C.phrase(`Benvenuto in raccolta differenziata Lodi Vecchio,
-              cosa vuoi sapere.?`))
+              cosa vuoi sapere?`))
       .reprompt('Per scoprire tutte le funzionalità di questa skill, prova a chiedere aiuto!')
+      .withShouldEndSession(false)
       .getResponse();
   },
 };
@@ -293,7 +294,8 @@ const WhereIntent = {
     } else {
       log('WHERE repeat');
       responseBuilder
-        .speak('Ripeti il nome del rifiuto per favore.')
+        .speak('Quale rifiuto?')
+        .withShouldEndSession(false)
         .addElicitSlotDirective('garbage');
     }
     return responseBuilder
@@ -324,8 +326,9 @@ const WhenIntent = {
     } else {
       log('WHEN repeat');
       responseBuilder
-        .speak('Ripeti la tipologia dei rifiuti per favore.')
-        .addElicitSlotDirective('material');
+        .speak('Quale tipologia di rifiuti?')
+        .addElicitSlotDirective('material')
+        .withShouldEndSession(false);
     }
     return responseBuilder
       .getResponse();
@@ -370,8 +373,9 @@ const WhatIntent = {
         /* .withSimpleCard(CARD_TITLE, execWhat(date, OUT_CARD)) */;
     } else {
       log('WHAT repeat');
-      responseBuilder.speak('Ripeti la data per favore.')
-        .addElicitSlotDirective('date');
+      responseBuilder.speak('Quando?')
+        .addElicitSlotDirective('date')
+        .withShouldEndSession(false);
     }
     return responseBuilder
       .getResponse();
@@ -405,12 +409,16 @@ const InfoIntent = {
       if (!attr.get('count')) {
         attr.set('count', 1);
         responseBuilder
-          .speak('Ripeti la tipologia dei rifiuti, per favore.');
+          .speak('Quale tipologia di rifiuti?')
+          .reprompt(`Puoi chiedere informazioni su queste tipologie di rifiuti: 
+            umido, secco, plastica, carta, vetro, pile o farmaci.`)
+          .withShouldEndSession(false);
       } else {
         attr.set('count', 0);
         responseBuilder
           .speak(`Puoi chiedere informazioni su queste tipologie di rifiuti: 
-            umido, secco, plastica, carta, vetro, pile o farmaci.`);
+            umido, secco, plastica, carta, vetro, pile o farmaci.`)
+          .withShouldEndSession(false);
       }
       responseBuilder.addElicitSlotDirective('material');
     }

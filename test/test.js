@@ -107,8 +107,8 @@ describe('raccolta differenziata', function () {
                     value: 'xxxx',
                     synonim: null,
                     id: null
-                }, true, true, (context, speech) =>
-                        expect(speech).contains('Ripeti il nome del rifiuto per favore')
+                }, true, false, (context, speech) =>
+                        expect(speech).contains('Quale')
                 );
             });
 
