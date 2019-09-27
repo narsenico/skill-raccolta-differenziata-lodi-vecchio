@@ -16,9 +16,9 @@
   "author": "narsenico",
   "license": "ISC",
   "dependencies": {
-    "ask-sdk-core": "^2.0.0",
-    "ask-sdk-model": "^1.0.0",
-    "moment": "^2.22.2",
-    "moment-timezone": "^0.5.23"
+    "ask-sdk-core": "^2.7.0",
+    "ask-sdk-model": "^1.19.0",
+    "moment": "^2.24.0",
+    "moment-timezone": "^0.5.26"
   }
 }

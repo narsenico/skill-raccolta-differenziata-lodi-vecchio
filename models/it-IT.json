@@ -85,6 +85,7 @@
                         }
                     ],
                     "samples": [
+                        "{dayOfWeek}",
                         "cosa ritirano",
                         "cosa ritirano il prossimo {dayOfWeek}",
                         "cosa ritirano la prossima {dayOfWeek}",
@@ -222,7 +223,7 @@
                         {
                             "id": "LATT",
                             "name": {
-                                "value": "lattina",
+                                "value": "lattine",
                                 "synonyms": [
                                     "lattine",
                                     "scatolame"
@@ -234,7 +235,7 @@
                             "name": {
                                 "value": "pile",
                                 "synonyms": [
-                                    "pila"
+                                    "pile"
                                 ]
                             }
                         },
@@ -292,6 +293,7 @@
                                     "scatola di cartone",
                                     "scatole di cartone",
                                     "tetrapak",
+                                    "tetra pak",
                                     "tovaglia di carta",
                                     "tovagliolo di carta",
                                     "tovaglioli di carta",

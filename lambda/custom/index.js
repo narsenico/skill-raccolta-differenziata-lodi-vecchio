@@ -5,7 +5,7 @@
  * @name skill-raccolta-differenziata-lodi-vecchio
  * @author Caldi Gianfranco
  * @version 1.0.0
- * 
+ *
  * @see per il glossario rifiuti vedere http://www.linea-gestioni.it/it/glossario-rifiuti
  */
 
@@ -24,19 +24,19 @@ const CARD_TITLE = 'Raccolta differenziata Lodi Vecchio',
   DATE_FORMAT = 'YYYY-MM-DD',
   DATE_LONG_FORMAT = 'dddd, D MMMM',
   MATERIALS = require('./materials.json'),
-  CALENDAR = require('./calendar.json'),
-  RCALENDAR = reveserCalendar(),
+  RCALENDAR = require('./calendar.json'),
+  CALENDAR = reveserCalendar(),
   rgPlural = /^(i|gli|le)$/i,
   // ora in cui viene ritirata la spazzatura
   TRASH_COLLECTION_HOUR = 6,
   // fuso orario italia
-  // TODO: recuperare la timezone 
+  // TODO: recuperare la timezone
   //  https://developer.amazon.com/docs/smapi/alexa-settings-api-reference.html#request
   //  access token e device id sono in handlerInput.requestEnvelope
   TIMEZONE = 'Europe/Rome';
 
 /**
- * 
+ *
  * @param {Strign} idGarbage id rifiuto
  * @param {String} article  particella articolo
  * @param {String} garbage frase pronunciata dall'utente
@@ -57,7 +57,7 @@ function execWhere(idGarbage, article, garbage, outDest) {
 
 /**
  * Dato il codice materiale ritorna il giorno di ritiro.
- * 
+ *
  * @param {String} idMaterial vedi chiavi in materials.json
  * @param {OUT_SPEAKER|OUT_CARD} outDest  destinazione
  * @returns la frase in output già formattata in base alla destinazione
@@ -94,16 +94,16 @@ function execWhen(idMaterial, outDest) {
   if (material && material.help) {
     return C.phrase('Non è previsto alcun ritiro.', ...material.help);
   } else {
-    return C.phrase(`Non è previsto alcun ritiro per il materiale indicato, 
+    return C.phrase(`Non è previsto alcun ritiro per il materiale indicato,
       contattare il comune per maggiori informazioni.`);
   }
 }
 
 /**
  * ELenca i materiali ritirati nei giorni in input.
- * 
+ *
  * @param {Array<String>} dates array di date nel formato YYYY-MM-DD
- * @param {OUT_SPEAKER|OUT_CARD} outDest  destinazione 
+ * @param {OUT_SPEAKER|OUT_CARD} outDest  destinazione
  * @returns la frase in output già formattata in base alla destinazione
  */
 function execWhat(dates, outDest) {
@@ -143,7 +143,7 @@ function execWhat(dates, outDest) {
       } else if (dates[0] === stomorrow) {
         output = C.phrase('Per domani non è previsto alcun ritiro');
       } else {
-        output = C.phrase(`${moment(dates[0]).locale('it').format(DATE_LONG_FORMAT)}, 
+        output = C.phrase(`${moment(dates[0]).locale('it').format(DATE_LONG_FORMAT)},
           non è previsto alcun ritiro`);
       }
     } else {
@@ -155,7 +155,7 @@ function execWhat(dates, outDest) {
 
 /**
  * Dato il codice materiale ne ritorna le informazioni.
- * 
+ *
  * @param {String} idMaterial vedi chiavi in materials.json
  * @param {OUT_SPEAKER|OUT_CARD} outDest  destinazione
  * @returns la frase in output già formattata in base alla destinazione
@@ -183,17 +183,17 @@ function execInfo(idMaterial, outDest) {
 
 /**
  * Analzza la stringa in input e ne ricava un elenco di date.
- * 
+ *
  * I formati riconosciuti sono:
  * - YYYY-MM-DD
  * - YYYY-W<numero settimana>
  * - YYYY-W<numero settimana>-WE (weekend)
  * - giorni della settimana
- * 
+ *
  * La settimana parte da lunedì.
- * 
+ *
  * @param {String} sdate data da analizzare
- * @returns {Array<String>} un array di date nel formato YYYY-MM-DD oppure null se il formato non è valido 
+ * @returns {Array<String>} un array di date nel formato YYYY-MM-DD oppure null se il formato non è valido
  */
 function parseDateString(sdate) {
   const dayOfWeek = DAY_OF_WEEK.indexOf(sdate);
@@ -222,7 +222,7 @@ function parseDateString(sdate) {
 /**
  * Ritorna mdate se il giorno della settimana corrisponde con dayOfWeek,
  * oppure il prossimo giorno con quel dayOfWeek.
- * 
+ *
  * @param {Moment} mdate istanza di moment da cui partire
  * @param {Number} dayOfWeek indice del giorno della settimana (domencia = 0)
  * @returns mdate (aggiornata)
@@ -244,8 +244,8 @@ function nextDay(dayOfWeek) {
 }
 
 function reveserCalendar() {
-  return Object.keys(CALENDAR).reduce((m, k) => {
-    return CALENDAR[k].reduce((m, d) => {
+  return Object.keys(RCALENDAR).reduce((m, k) => {
+    return RCALENDAR[k].reduce((m, d) => {
       (m[d] || (m[d] = [])).push(k);
       return m;
     }, m);
@@ -257,6 +257,8 @@ const LaunchRequestHandler = {
     return handlerInput.requestEnvelope.request.type === 'LaunchRequest';
   },
   handle(handlerInput) {
+    // TODO: [B0001] elencare i prossimi ritiri (a cominciare da oggi se mattina presto)
+
     const C = COMPOSER[OUT_SPEAKER];
     return handlerInput.responseBuilder
       .speak(C.phrase(`Benvenuto in raccolta differenziata Lodi Vecchio,
@@ -305,7 +307,7 @@ const WhereIntent = {
 
 /**
  * Intenet per conoscere le date di ritiro di una certa tipologia di rifiuti.
- * 
+ *
  * Slots:
  * - {article} articolo, non utilizzato
  * - {material} tipologia del rifiuto
@@ -337,7 +339,7 @@ const WhenIntent = {
 
 /**
  * Intent per conoscere cosa viene ritirano un particolare giorno.
- * 
+ *
  * Slots:
  * - {date} nel formato YYYY-MM-DD, YYYY-W<numero settimana>, YYYY-W<numero settimana>-WE
  * - {dayOfWeek}  giorni della settimana
@@ -384,7 +386,7 @@ const WhatIntent = {
 
 /**
  * Intenet per chiedere informazioni sulla tipologia di un rifiuto.
- * 
+ *
  * Slots:
  * - {article} articolo, non utilizzato
  * - {preposition} preposizione, non utilizzato
@@ -410,13 +412,13 @@ const InfoIntent = {
         attr.set('count', 1);
         responseBuilder
           .speak('Quale tipologia di rifiuti?')
-          .reprompt(`Puoi chiedere informazioni su queste tipologie di rifiuti: 
+          .reprompt(`Puoi chiedere informazioni su queste tipologie di rifiuti:
             umido, secco, plastica, carta, vetro, pile o farmaci.`)
           .withShouldEndSession(false);
       } else {
         attr.set('count', 0);
         responseBuilder
-          .speak(`Puoi chiedere informazioni su queste tipologie di rifiuti: 
+          .speak(`Puoi chiedere informazioni su queste tipologie di rifiuti:
             umido, secco, plastica, carta, vetro, pile o farmaci.`)
           .withShouldEndSession(false);
       }
