@@ -134,7 +134,7 @@ function execWhat(dates, outDest) {
   }
   if (output) {
     if (sayRemember) {
-      output + C.phrase('Ricordati che devi esporre i rifiuti entro le ore sei');
+      output += C.phrase('Ricordati che devi esporre i rifiuti entro le ore sei');
     }
   } else {
     if (dates.length === 1) {
@@ -149,6 +149,61 @@ function execWhat(dates, outDest) {
     } else {
       output = C.phrase('Per il periodo indicato, non è previsto alcun ritiro');
     }
+  }
+  return output;
+}
+
+function execNext(outDest) {
+  const C = COMPOSER[outDest];
+  let theday = moment();
+  let stheday;
+  let materialsPerDate;
+  let output = '';
+
+  // TODO: esempi
+  // - Oggi ritirano carta e cartone, ma sei un po' in ritardo perché devi esporre i rifiuti entro le ore 6;
+  //  mentre domani ritirano la plastica.
+  // - Il prossimo ritirno è per domani: carta e cartone. Ricordati di esporre i rifiuti entro le ore 6.
+
+  // controllo oggi
+  stheday = theday.format(DATE_FORMAT);
+  materialsPerDate = RCALENDAR[stheday];
+  if (materialsPerDate) {
+    output += C.phrase(`Oggi ritirano ${humanJoin(materialsPerDate.map(m => MATERIALS[m].what), 'e')}.`);
+    // controllo anche domani
+    theday = theday.add(1, 'days');
+    stheday = theday.format(DATE_FORMAT);
+    materialsPerDate = RCALENDAR[stheday];
+    if (materialsPerDate) {
+      output += C.phrase(`Mentre domani ritirano ${humanJoin(materialsPerDate.map(m => MATERIALS[m].what), 'e')}.`);
+    }
+  } else {
+    // controllo domani
+    theday = theday.add(1, 'days');
+    stheday = theday.format(DATE_FORMAT);
+    materialsPerDate = RCALENDAR[stheday];
+    if (materialsPerDate) {
+      output += C.phrase(`Domani, ${moment(theday).locale('it').format(DATE_LONG_FORMAT)},
+            ritirano ${humanJoin(materialsPerDate.map(m => MATERIALS[m].what), 'e')}.`);
+    } else {
+      // altrimenti cerco il primo giorno con un ritiro
+      for (var ii = 2; ii < 7; ii++) {
+        theday = theday.add(1, 'days');
+        stheday = theday.format(DATE_FORMAT);
+        materialsPerDate = RCALENDAR[stheday];
+        if (materialsPerDate) {
+          output += C.list(`Il prossimo ritiro è previsto per ${theday.locale('it').format(DATE_LONG_FORMAT)}:
+            ${humanJoin(materialsPerDate.map(m => MATERIALS[m].what), 'e')}.`);
+          break;
+        }
+      }
+    }
+  }
+  if (output) {
+    output += C.phrase('Ricordati che devi esporre i rifiuti entro le ore sei.');
+  } else {
+    // questo è un problema: significa che non c'è più nulla censito
+    output = C.phrase('Mi dispiace non sono state trovate informazioni utili per il prossimo ritiro.');
   }
   return output;
 }
@@ -261,10 +316,14 @@ const LaunchRequestHandler = {
 
     const C = COMPOSER[OUT_SPEAKER];
     return handlerInput.responseBuilder
-      .speak(C.phrase(`Benvenuto in raccolta differenziata Lodi Vecchio,
-              cosa vuoi sapere?`))
-      .reprompt('Per scoprire tutte le funzionalità di questa skill, prova a chiedere aiuto!')
-      .withShouldEndSession(false)
+      // .speak(C.phrase('Benvenuto in raccolta differenziata Lodi Vecchio.',
+      //   execNext(OUT_SPEAKER),
+      //   'Vuoi sapere altro?'))
+      // .reprompt('Per scoprire tutte le funzionalità di questa skill, prova a chiedere aiuto!')
+      // .withShouldEndSession(false)
+      .speak(C.phrase('Benvenuto in raccolta differenziata Lodi Vecchio.') +
+        C.break(350) +
+        execNext(OUT_SPEAKER))
       .getResponse();
   },
 };
