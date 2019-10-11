@@ -29,6 +29,8 @@ const CARD_TITLE = 'Raccolta differenziata Lodi Vecchio',
   rgPlural = /^(i|gli|le)$/i,
   // ora in cui viene ritirata la spazzatura
   TRASH_COLLECTION_HOUR = 6,
+  // presumibile ora limite entro cui esporre la spazzatura
+  TRASH_COLLECTION_HOUR_EXT = 9,
   // fuso orario italia
   // TODO: recuperare la timezone
   //  https://developer.amazon.com/docs/smapi/alexa-settings-api-reference.html#request
@@ -153,6 +155,14 @@ function execWhat(dates, outDest) {
   return output;
 }
 
+/**
+ * ELenca i prossimi materiali ritirati.
+ * Se non è ancora passata l'ora limite di ritiro prova per oggi,
+ * alrimenti domani, etc.
+ *
+ * @param {OUT_SPEAKER|OUT_CARD} outDest  destinazione
+ * @returns la frase in output già formattata in base alla destinazione
+ */
 function execNext(outDest) {
   const C = COMPOSER[outDest];
   let theday = moment();
@@ -160,15 +170,11 @@ function execNext(outDest) {
   let materialsPerDate;
   let output = '';
 
-  // TODO: esempi
-  // - Oggi ritirano carta e cartone, ma sei un po' in ritardo perché devi esporre i rifiuti entro le ore 6;
-  //  mentre domani ritirano la plastica.
-  // - Il prossimo ritirno è per domani: carta e cartone. Ricordati di esporre i rifiuti entro le ore 6.
-
   // controllo oggi
   stheday = theday.format(DATE_FORMAT);
   materialsPerDate = RCALENDAR[stheday];
-  if (materialsPerDate) {
+  // se non è ancora passata l'ora limite...
+  if (materialsPerDate && theday.tz(TIMEZONE).hour() <= TRASH_COLLECTION_HOUR_EXT) {
     output += C.phrase(`Oggi ritirano ${humanJoin(materialsPerDate.map(m => MATERIALS[m].what), 'e')}.`);
     // controllo anche domani
     theday = theday.add(1, 'days');
